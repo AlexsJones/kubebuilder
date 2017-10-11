@@ -32,7 +32,7 @@ func main() {
 	}
 
 	//Generate a new state object
-	st := data.NewMessage()
+	st := data.NewMessage(data.NewMessageContext())
 
 	out, err := proto.Marshal(st)
 	if err != nil {

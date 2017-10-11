@@ -31,7 +31,7 @@ func main() {
 	}
 
 	//Create a message processor
-	messageProcessor := processor.NewMessageProcessor(&map[string]func(){})
+	messageProcessor := processor.NewMessageProcessor(processor.NewIntentionsMapping())
 
 	if err := event.Subscribe(gpubsub, func(arg2 event.IMessage) {
 

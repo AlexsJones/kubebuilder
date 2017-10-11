@@ -10,11 +10,11 @@ import (
 
 //MessageProcessor object definition
 type MessageProcessor struct {
-	intentionMap *map[string]func()
+	intentionMap *map[string]func(p *data.Message)
 }
 
 //NewMessageProcessor creates a new MessageProcessor object
-func NewMessageProcessor(intentions *map[string]func()) *MessageProcessor {
+func NewMessageProcessor(intentions *map[string]func(p *data.Message)) *MessageProcessor {
 	return &MessageProcessor{
 		intentionMap: intentions,
 	}
@@ -31,8 +31,8 @@ func (m *MessageProcessor) Ingest(message event.IMessage) (bool, error) {
 
 	im := m.intentionMap
 
-	if ok, _ := (*im)[st.Type.String()]; ok != nil {
-
+	if fn, ok := (*im)[st.Type.String()]; ok {
+		fn(st)
 	}
 	log.Println(st.Type.String())
 

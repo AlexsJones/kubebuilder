@@ -10,5 +10,7 @@ enum Intent {
     BUILD = 300;
   }
   UUID uuid = 1;
-  Intent type = 2;
+  //Context persists across message chains
+  UUID context = 2;
+  Intent type = 3;
 }
