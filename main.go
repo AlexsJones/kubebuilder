@@ -29,24 +29,8 @@ func main() {
 	if err := event.Connect(gpubsub, gconfig); err != nil {
 		log.Fatal(err)
 	}
-
 	//Create a message processor
-	messageProcessor := processor.NewMessageProcessor(processor.NewIntentionsMapping())
+	messageProcessor := processor.NewMessageProcessor(processor.NewIntentionsMapping(), gpubsub, gconfig)
 
-	if err := event.Subscribe(gpubsub, func(arg2 event.IMessage) {
-
-		if ok, err := messageProcessor.Ingest(arg2); err != nil {
-			//Currently no handler for a failed message
-		} else {
-			if ok {
-				log.Println("MQ:ACK")
-				arg2.Ack()
-			} else {
-				log.Println("MQ:NACK")
-				arg2.Nack()
-			}
-		}
-	}); err != nil {
-		log.Fatal(err)
-	}
+	messageProcessor.Start()
 }
