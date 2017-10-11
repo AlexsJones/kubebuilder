@@ -1,0 +1,5 @@
+syntax = "proto3";
+package data;
+message UUID {
+   string value = 1;
+}

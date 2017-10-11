@@ -30,14 +30,19 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//Create a message processor
+	messageProcessor := processor.NewMessageProcessor(&map[string]func(){})
+
 	if err := event.Subscribe(gpubsub, func(arg2 event.IMessage) {
 
-		if ok, err := processor.MessageProcessor(arg2); err != nil {
+		if ok, err := messageProcessor.Ingest(arg2); err != nil {
 			//Currently no handler for a failed message
 		} else {
 			if ok {
+				log.Println("MQ:ACK")
 				arg2.Ack()
 			} else {
+				log.Println("MQ:NACK")
 				arg2.Nack()
 			}
 		}

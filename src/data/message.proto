@@ -1,10 +1,14 @@
 syntax = "proto3";
 package data;
+import "src/data/uuid.proto";
 
-message UUID {
-   string value = 1;
+message Message {
+enum Intent {
+    SYN = 0;
+    ACK = 100;
+    STATECHANGE = 200;
+    BUILD = 300;
+  }
+  UUID uuid = 1;
+  Intent type = 2;
 }
-
- message Message {
-   UUID uuid = 1;
- }
