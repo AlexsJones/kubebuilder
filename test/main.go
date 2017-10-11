@@ -7,6 +7,8 @@ import (
 	event "github.com/AlexsJones/cloud-transponder/events"
 	"github.com/AlexsJones/cloud-transponder/events/pubsub"
 	"github.com/AlexsJones/kubebuilder/src/config"
+	"github.com/AlexsJones/kubebuilder/src/data"
+	"github.com/golang/protobuf/proto"
 )
 
 func main() {
@@ -25,11 +27,19 @@ func main() {
 	gconfig.Topic = conf.GCPConfiguration.Topic
 	gconfig.ConnectionString = conf.GCPConfiguration.ConnectionString
 
-	if err := event.Connect(gpubsub, gconfig); err != nil {
+	if err = event.Connect(gpubsub, gconfig); err != nil {
 		log.Fatal(err)
 	}
 
-	event.Publish(gpubsub, []byte("Test message!"))
+	//Generate a new state object
+	st := data.NewState()
+
+	out, err := proto.Marshal(st)
+	if err != nil {
+		log.Fatalln("Failed to encode address book:", err)
+	}
+
+	event.Publish(gpubsub, out)
 
 	time.Sleep(time.Minute)
 }
