@@ -5,6 +5,6 @@ message UUID {
    string value = 1;
 }
 
- message State {
+ message Message {
    UUID uuid = 1;
  }

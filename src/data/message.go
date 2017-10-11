@@ -6,12 +6,12 @@ import (
 	"github.com/nu7hatch/gouuid"
 )
 
-//NewState Creates a new bare state object
-func NewState() *State {
+//NewMessage Creates a new bare state object
+func NewMessage() *Message {
 	u, err := uuid.NewV4()
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &State{Uuid: &UUID{Value: u.String()}}
+	return &Message{Uuid: &UUID{Value: u.String()}}
 
 }

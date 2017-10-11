@@ -34,7 +34,7 @@ func main() {
 	if err := event.Subscribe(gpubsub, func(arg2 event.IMessage) {
 
 		log.Println("Received message")
-		st := &data.State{}
+		st := &data.Message{}
 		if err := proto.Unmarshal(arg2.GetRaw(), st); err != nil {
 			log.Fatalln("Failed to parse address book:", err)
 		}
