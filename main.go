@@ -6,8 +6,7 @@ import (
 	event "github.com/AlexsJones/cloud-transponder/events"
 	"github.com/AlexsJones/cloud-transponder/events/pubsub"
 	"github.com/AlexsJones/kubebuilder/src/config"
-	"github.com/AlexsJones/kubebuilder/src/data"
-	"github.com/golang/protobuf/proto"
+	"github.com/AlexsJones/kubebuilder/src/processor"
 )
 
 func main() {
@@ -33,15 +32,15 @@ func main() {
 
 	if err := event.Subscribe(gpubsub, func(arg2 event.IMessage) {
 
-		log.Println("Received message")
-		st := &data.Message{}
-		if err := proto.Unmarshal(arg2.GetRaw(), st); err != nil {
-			log.Fatalln("Failed to parse address book:", err)
+		if ok, err := processor.MessageProcessor(arg2); err != nil {
+			//Currently no handler for a failed message
+		} else {
+			if ok {
+				arg2.Ack()
+			} else {
+				arg2.Nack()
+			}
 		}
-
-		log.Println(st.GetUuid().String())
-
-		arg2.Ack()
 	}); err != nil {
 		log.Fatal(err)
 	}

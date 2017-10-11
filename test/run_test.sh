@@ -11,7 +11,7 @@ other_commands() {
 
 trap 'other_commands' SIGINT
 
-echo "Starting consumer..."
+echo "Starting subscriber..."
 go run main.go &
 child_pid1=$!
 sleep 3
