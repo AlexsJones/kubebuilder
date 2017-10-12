@@ -24,6 +24,7 @@ func NewIntentionsMapping() *map[string]func(*data.Message) (bool, *data.Message
 		},
 		"ACK": func(p *data.Message) (bool, *data.Message) {
 
+			log.Println("Receieved ACK from builder")
 			return false, nil
 		},
 	}
