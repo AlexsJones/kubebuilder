@@ -27,5 +27,11 @@ func NewIntentionsMapping() *map[string]func(*data.Message) (bool, *data.Message
 			log.Println("Receieved ACK from builder")
 			return false, nil
 		},
+		"STATECHANGE": func(p *data.Message) (bool, *data.Message) {
+			return false, nil
+		},
+		"BUILD": func(p *data.Message) (bool, *data.Message) {
+			return false, nil
+		},
 	}
 }
