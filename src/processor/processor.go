@@ -10,13 +10,13 @@ import (
 
 //MessageProcessor object definition
 type MessageProcessor struct {
-	intentionMap           *map[string]func(p *data.Message)
+	intentionMap           *map[string]func(p *data.Message) (bool, *data.Message)
 	PubSubRef              event.IEvent
 	PubSubConfigurationRef event.IEventConfiguration
 }
 
 //NewMessageProcessor creates a new MessageProcessor object
-func NewMessageProcessor(intentions *map[string]func(p *data.Message), pubsub event.IEvent, pubsubconf event.IEventConfiguration) *MessageProcessor {
+func NewMessageProcessor(intentions *map[string]func(p *data.Message) (bool, *data.Message), pubsub event.IEvent, pubsubconf event.IEventConfiguration) *MessageProcessor {
 	return &MessageProcessor{
 		intentionMap:           intentions,
 		PubSubRef:              pubsub,
@@ -54,14 +54,27 @@ func (m *MessageProcessor) ingest(message event.IMessage) (bool, error) {
 	im := m.intentionMap
 
 	if fn, ok := (*im)[st.Type.String()]; ok {
-		fn(st)
+		if reply, parcel := fn(st); reply {
+			m.egest(parcel)
+		}
 	}
 	log.Println(st.Type.String())
 
 	return true, nil
 }
 
-func (m *MessageProcessor) egest(message event.IMessage) (bool, error) {
+//egest messages outward into the pubsub
+func (m *MessageProcessor) egest(message proto.Message) (bool, error) {
 
-	return false, nil
+	out, err := proto.Marshal(message)
+	if err != nil {
+		log.Printf("Failed to encode message %s\n", err.Error())
+		return false, err
+	}
+
+	if err := event.Publish(m.PubSubRef, out); err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
