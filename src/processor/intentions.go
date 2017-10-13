@@ -12,7 +12,7 @@ func NewIntentionsMapping() *map[string]func(*data.Message) (bool, *data.Message
 	return &map[string]func(*data.Message) (bool, *data.Message){
 		"SYN": func(p *data.Message) (bool, *data.Message) {
 			log.Println("Received SYN message...")
-			//Reply with ACK using the context
+
 			if p.Context.String() == "" {
 				log.Println("Cannot ACK to message without context")
 				return false, nil
@@ -24,13 +24,15 @@ func NewIntentionsMapping() *map[string]func(*data.Message) (bool, *data.Message
 		},
 		"ACK": func(p *data.Message) (bool, *data.Message) {
 
-			log.Println("Receieved ACK from builder")
+			log.Printf("Receieved ACK from builder with context %s\n", p.Context.Value)
 			return false, nil
 		},
 		"STATECHANGE": func(p *data.Message) (bool, *data.Message) {
+
 			return false, nil
 		},
 		"BUILD": func(p *data.Message) (bool, *data.Message) {
+
 			return false, nil
 		},
 	}

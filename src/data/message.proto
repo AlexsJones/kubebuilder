@@ -13,4 +13,5 @@ enum Intent {
   //Context persists across message chains
   UUID context = 2;
   Intent type = 3;
+  string payload = 4;
 }
