@@ -16,5 +16,5 @@ go run main.go &
 child_pid1=$!
 sleep 3
 echo "Starting publisher..."
-go run test/ack/main.go
+go run tests/integration_tests/ack/main.go
 child_pid2=$!

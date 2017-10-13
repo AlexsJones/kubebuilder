@@ -8,3 +8,4 @@ Allowing developers to deploy temporary containers/staging code from their compu
 ## Requirements
 
 - protobuf-compiler
+- sshkey for VCS (git currently)

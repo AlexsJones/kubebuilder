@@ -1,7 +1,9 @@
+kubebuilder:
+  mount: ./mount
 gcp:
   connectionString: beamery-trials
   topic: cadium
   subscriptionString: cadium-sub
 cvs:
   git:
-    sshKey: 
+    sshKey: ""
