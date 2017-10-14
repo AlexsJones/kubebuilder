@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"log"
 	"time"
 
@@ -9,6 +11,7 @@ import (
 	"github.com/AlexsJones/kubebuilder/src/config"
 	"github.com/AlexsJones/kubebuilder/src/data"
 	"github.com/golang/protobuf/proto"
+	yaml "gopkg.in/yaml.v2"
 )
 
 func main() {
@@ -36,9 +39,23 @@ func main() {
 	//Set our outbound message to indicate a build
 	st.Type = data.Message_BUILD
 
+	//Load yaml
+	raw, err := ioutil.ReadFile("./tests/integration_tests/build/testbuild.yaml")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	builddef := data.BuildDefinition{}
+
+	err = yaml.Unmarshal(raw, &builddef)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	fmt.Printf("--- t:\n%v\n\n", builddef)
+
 	out, err := proto.Marshal(st)
 	if err != nil {
-		log.Fatalln("Failed to encode address book:", err)
+		log.Fatalln("Failed to encode:", err)
 	}
 
 	event.Publish(gpubsub, out)

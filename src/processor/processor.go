@@ -5,6 +5,7 @@ import (
 
 	event "github.com/AlexsJones/cloud-transponder/events"
 	"github.com/AlexsJones/kubebuilder/src/data"
+	"github.com/AlexsJones/kubebuilder/src/fabricarium"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -13,10 +14,12 @@ type MessageProcessor struct {
 	intentionMap           *map[string]func(p *data.Message) (bool, *data.Message)
 	PubSubRef              event.IEvent
 	PubSubConfigurationRef event.IEventConfiguration
+	FabricariumRef         *fabricarium.Fabricarium
 }
 
 //NewMessageProcessor creates a new MessageProcessor object
-func NewMessageProcessor(intentions *map[string]func(p *data.Message) (bool, *data.Message), pubsub event.IEvent, pubsubconf event.IEventConfiguration) *MessageProcessor {
+func NewMessageProcessor(intentions *map[string]func(p *data.Message) (bool, *data.Message), pubsub event.IEvent, pubsubconf event.IEventConfiguration,
+	fabricarium *fabricarium.Fabricarium) *MessageProcessor {
 	return &MessageProcessor{
 		intentionMap:           intentions,
 		PubSubRef:              pubsub,

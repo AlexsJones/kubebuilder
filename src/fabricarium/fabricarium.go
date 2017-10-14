@@ -5,11 +5,14 @@ type Fabricarium struct {
 	Configuration *Configuration
 }
 
+//Mount ...
+type Mount struct {
+	Path string
+}
+
 //Configuration holds configuration information
 type Configuration struct {
-	Mount struct {
-		Path string
-	}
+	MountInformation *Mount
 }
 
 //NewFabricarium creates the builder that receivees YAML build scripts
