@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/base64"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"time"
@@ -53,7 +52,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-	fmt.Printf("--- t:\n%v\n\n", builddef)
+	log.Printf("%v\n", builddef)
 
 	//Add the build as an encoded string into our message
 	out, err := yaml.Marshal(builddef)

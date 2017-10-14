@@ -21,3 +21,7 @@ func NewFabricarium(conf *Configuration) *Fabricarium {
 	return &Fabricarium{Configuration: conf}
 
 }
+
+func (f *Fabricarium) ProcessBuild() {
+
+}

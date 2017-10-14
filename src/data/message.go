@@ -31,3 +31,11 @@ func NewMessage(context ...string) *Message {
 	return &Message{Uuid: &UUID{Value: u.String()}, Context: &UUID{Value: senderContext}}
 
 }
+
+//NewStateMessage for updates
+func NewStateMessage(incomingContext string, message string) *Message {
+	st := NewMessage(incomingContext)
+	st.Type = Message_STATECHANGE
+	st.Payload = message
+	return st
+}

@@ -2,6 +2,7 @@ package processor
 
 import (
 	"log"
+	"time"
 
 	event "github.com/AlexsJones/cloud-transponder/events"
 	"github.com/AlexsJones/kubebuilder/src/data"
@@ -29,24 +30,44 @@ func NewMessageProcessor(intentions *map[string]func(p *data.Message) (bool, *da
 
 //Start the blocking process to ingest and egest traffic
 func (m *MessageProcessor) Start() {
-	if err := event.Subscribe(m.PubSubRef, func(arg2 event.IMessage) {
 
-		if ok, err := m.ingest(arg2); err != nil {
-			//Currently no handler for a failed message
-		} else {
-			if ok {
-				arg2.Ack()
+	messageChannel := make(chan *data.Message)
+
+	go func() {
+		if err := event.Subscribe(m.PubSubRef, func(arg2 event.IMessage) {
+
+			if ok, err := m.ingest(arg2, messageChannel); err != nil {
+				//Currently no handler for a failed message
 			} else {
-				arg2.Nack()
+				if ok {
+					arg2.Ack()
+				} else {
+					arg2.Nack()
+				}
 			}
+		}); err != nil {
+			log.Fatal(err)
 		}
-	}); err != nil {
-		log.Fatal(err)
+	}()
+
+	for {
+		select {
+		case msg := <-messageChannel:
+			if msg != nil {
+				log.Println("Message processed & replied")
+				m.egest(msg)
+			} else {
+				log.Println("Message processed")
+			}
+		default:
+		}
+		time.Sleep(time.Millisecond * 500)
 	}
+
 }
 
 //Ingest and processes incoming messages
-func (m *MessageProcessor) ingest(message event.IMessage) (bool, error) {
+func (m *MessageProcessor) ingest(message event.IMessage, messageChannel chan *data.Message) (bool, error) {
 	log.Printf("Received message of size %d\n", len(message.GetRaw()))
 	st := &data.Message{}
 	if err := proto.Unmarshal(message.GetRaw(), st); err != nil {
@@ -57,8 +78,11 @@ func (m *MessageProcessor) ingest(message event.IMessage) (bool, error) {
 	im := m.intentionMap
 
 	if fn, ok := (*im)[st.Type.String()]; ok {
+
 		if reply, parcel := fn(st); reply {
-			m.egest(parcel)
+			messageChannel <- parcel
+		} else {
+			messageChannel <- nil
 		}
 	}
 	return true, nil
