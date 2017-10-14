@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -45,6 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//Hand cranking a build definition for the test
 	builddef := data.BuildDefinition{}
 
 	err = yaml.Unmarshal(raw, &builddef)
@@ -53,7 +55,15 @@ func main() {
 	}
 	fmt.Printf("--- t:\n%v\n\n", builddef)
 
-	out, err := proto.Marshal(st)
+	//Add the build as an encoded string into our message
+	out, err := yaml.Marshal(builddef)
+	if err != nil {
+		log.Fatalln("Failed to marshal:", err)
+	}
+
+	st.Payload = base64.StdEncoding.EncodeToString(out)
+
+	out, err = proto.Marshal(st)
 	if err != nil {
 		log.Fatalln("Failed to encode:", err)
 	}

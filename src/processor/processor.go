@@ -61,8 +61,6 @@ func (m *MessageProcessor) ingest(message event.IMessage) (bool, error) {
 			m.egest(parcel)
 		}
 	}
-	log.Println(st.Type.String())
-
 	return true, nil
 }
 
