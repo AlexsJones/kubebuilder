@@ -58,9 +58,9 @@ func NewIntentionsMapping() *map[string]func(*data.Message) {
 			}
 			logger.GetInstance().Log(fmt.Sprintf("%v", builddef))
 
-			fab := fabricarium.NewFabricarium(&fabricarium.Configuration{})
+			fab := fabricarium.NewFabricarium(&fabricarium.Configuration{MountInformation: &fabricarium.Mount{Path: "/tmp/kubebuilder"}})
 
-			fab.ProcessBuild(&builddef)
+			fab.Process(&builddef)
 		},
 	}
 }

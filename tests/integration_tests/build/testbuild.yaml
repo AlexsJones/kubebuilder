@@ -1,11 +1,10 @@
 vcs:
   type: git
-  sshPath: git@github.com/AlexsJones/jnxlibc.git
+  name: jnxlibc
+  path: git@github.com:AlexsJones/jnxlibc.git
   checkoutArgs: ""
 build:
-  commands:
-    - cmake .
-    - make
+  commands: "pwd && ls -la"
   docker:
     imageNameSuffix: vTEST
     buildArgs:

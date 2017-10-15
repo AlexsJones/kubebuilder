@@ -20,8 +20,9 @@ k8s:
 
 //VCS ...
 type VCS struct {
-	Type         string `yaml:"type"`
-	SSHPath      string `yaml:"sshPath"`
+	Type         string `yaml:"type" validate:"required"`
+	Path         string `yaml:"path"`
+	Name         string `yaml:"name"`
 	CheckoutArgs string `yaml:"checkoutArgs"`
 }
 
@@ -33,19 +34,19 @@ type Docker struct {
 
 //Build ...
 type Build struct {
-	Commands []string `yaml:"commands"`
-	Docker   Docker   `yaml:"docker"`
+	Commands string `yaml:"commands" validate:"required"`
+	Docker   Docker `yaml:"docker"`
 }
 
 //K8s ...
 type K8s struct {
-	Deployment                  string `yaml:"deployment"`
-	ImagePlaceholderReplacement string `yaml:"imagePlaceholderReplacement"`
+	Deployment                  string `yaml:"deployment" validate:"required"`
+	ImagePlaceholderReplacement string `yaml:"imagePlaceholderReplacement" validate:"required"`
 }
 
 //BuildDefinition ...
 type BuildDefinition struct {
-	VCS   VCS   `yaml:"vcs"`
-	Build Build `yaml:"build"`
-	K8s   K8s   `yaml:"k8s"`
+	VCS   VCS   `yaml:"vcs" validate:"required"`
+	Build Build `yaml:"build" validate:"required"`
+	K8s   K8s   `yaml:"k8s" validate:"required"`
 }
