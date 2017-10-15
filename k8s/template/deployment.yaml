@@ -12,3 +12,19 @@ spec:
       containers:
       - name: master
         image: tibbar/{{.version}}
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /GOOGLE_APPLICATION_CREDENTIALS.json
+        volumeMounts:
+          - name: auth
+            mountPath: /GOOGLE_APPLICATION_CREDENTIALS.json
+      volumes:
+      #  - hostPath:
+      #     path: /var/run/docker.sock
+      #    name: dockersocket
+      #  - hostPath:
+      #     path: /sys/fs/cgroup
+         name: system
+       - name: auth
+         configMap:
+           name: kubebuilder-auth

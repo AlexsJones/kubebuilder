@@ -12,11 +12,12 @@ RUN set -x && \
   mv google-cloud-sdk / && \
   CLOUDSDK_CORE_DISABLE_PROMPTS=1 /google-cloud-sdk/install.sh && \
   rm -rfv /tmp/* && \
-  /google-cloud-sdk/bin/gcloud components update && \
-  cd /go/src/github.com/AlexsJones/kubebuilder && \
-  go get -v ./... && \
-  go install && \
-  rm -rfv $(find /go/src -type f | grep -v "kubebuilder") $GOPATH/pkg && \
-  apk del git wget
+  /google-cloud-sdk/bin/gcloud components update
 
 ENV PATH ${PATH}:/google-cloud-sdk/bin:${GOPATH}/bin
+
+RUN go get github.com/tools/godep
+RUN cd /go/src/github.com/AlexsJones/kubebuilder && godep restore && go build
+
+
+ENTRYPOINT ["kubebuilder"]
