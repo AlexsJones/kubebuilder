@@ -6,61 +6,61 @@ import (
 	"log"
 
 	"github.com/AlexsJones/kubebuilder/src/data"
+	"github.com/AlexsJones/kubebuilder/src/fabricarium"
+	"github.com/AlexsJones/kubebuilder/src/log"
 	yaml "gopkg.in/yaml.v2"
 )
 
 //NewIntentionsMapping Creates the intentions mappings...
-func NewIntentionsMapping() *map[string]func(*data.Message) (bool, *data.Message) {
+func NewIntentionsMapping() *map[string]func(*data.Message) {
 
-	return &map[string]func(*data.Message) (bool, *data.Message){
-		"SYN": func(p *data.Message) (bool, *data.Message) {
-			log.Printf("Receieved SYN intention \n")
+	return &map[string]func(*data.Message){
+		"SYN": func(p *data.Message) {
+			logger.GetInstance().Log("Receieved SYN intention")
 
 			if p.Context.String() == "" {
-				log.Println("Cannot SYN to message without context")
-				return false, nil
+				logger.GetInstance().Log("Cannot SYN to message without context")
+				return
 			}
 			reply := data.NewMessage(p.Context.String())
 			reply.Type = data.Message_ACK
 
-			return true, reply
 		},
-		"ACK": func(p *data.Message) (bool, *data.Message) {
+		"ACK": func(p *data.Message) {
 
-			log.Printf("Receieved ACK intention with context %s\n", p.Context.Value)
+			logger.GetInstance().Log(fmt.Sprintf("Receieved ACK intention with context %s", p.Context.Value))
 
-			return false, nil
 		},
-		"STATECHANGE": func(p *data.Message) (bool, *data.Message) {
-			log.Println("Receiving statechange intention")
-			fmt.Println("--State Change--")
-			fmt.Println(p.Payload)
-			fmt.Println("----------------")
-			return false, nil
+		"STATECHANGE": func(p *data.Message) {
+			logger.GetInstance().Log("Receiving statechange intention")
+			logger.GetInstance().Log("--State Change--")
+			logger.GetInstance().Log(fmt.Sprintf("%v", p.Payload))
+			logger.GetInstance().Log("----------------")
 		},
-		"BUILD": func(p *data.Message) (bool, *data.Message) {
-			log.Println("Receiving build intention")
+		"BUILD": func(p *data.Message) {
+			logger.GetInstance().Log("Receiving build intention")
 
 			if p.Payload == "" {
-				log.Println("Missing build payload")
-				return true, data.NewStateMessage(p.Context.String(), "Missing build payload")
+				logger.GetInstance().Log("Missing build payload")
+
 			}
 			decoded, err := base64.StdEncoding.DecodeString(p.Payload)
 			if err != nil {
 				log.Println("decode error:", err)
-				return true, data.NewStateMessage(p.Context.String(), "Decoding error")
+
 			}
 
 			builddef := data.BuildDefinition{}
 
 			err = yaml.Unmarshal(decoded, &builddef)
 			if err != nil {
-				log.Fatalf("error: %v", err)
-				return true, data.NewStateMessage(p.Context.String(), "Unmarshalling error")
+				logger.GetInstance().Fatal(fmt.Sprintf("error: %v", err))
 			}
-			log.Printf("%v\n", builddef)
+			logger.GetInstance().Log(fmt.Sprintf("%v", builddef))
 
-			return false, nil
+			fab := fabricarium.NewFabricarium(&fabricarium.Configuration{})
+
+			fab.ProcessBuild(&builddef)
 		},
 	}
 }

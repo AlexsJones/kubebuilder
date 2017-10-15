@@ -31,15 +31,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//Generate a new state object
-	st := data.NewMessage(data.NewMessageContext())
+	for i := 0; i < 10; i++ {
+		//Generate a new state object
+		st := data.NewMessage(data.NewMessageContext())
 
-	out, err := proto.Marshal(st)
-	if err != nil {
-		log.Fatalln("Failed to encode address book:", err)
+		out, err := proto.Marshal(st)
+		if err != nil {
+			log.Fatalln("Failed to encode address book:", err)
+		}
+		event.Publish(gpubsub, out)
 	}
-
-	event.Publish(gpubsub, out)
 
 	time.Sleep(time.Minute)
 }

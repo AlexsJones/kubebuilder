@@ -1,26 +1,24 @@
 package processor
 
 import (
+	"fmt"
 	"log"
-	"time"
 
 	event "github.com/AlexsJones/cloud-transponder/events"
 	"github.com/AlexsJones/kubebuilder/src/data"
-	"github.com/AlexsJones/kubebuilder/src/fabricarium"
+	"github.com/AlexsJones/kubebuilder/src/log"
 	"github.com/golang/protobuf/proto"
 )
 
 //MessageProcessor object definition
 type MessageProcessor struct {
-	intentionMap           *map[string]func(p *data.Message) (bool, *data.Message)
+	intentionMap           *map[string]func(p *data.Message)
 	PubSubRef              event.IEvent
 	PubSubConfigurationRef event.IEventConfiguration
-	FabricariumRef         *fabricarium.Fabricarium
 }
 
 //NewMessageProcessor creates a new MessageProcessor object
-func NewMessageProcessor(intentions *map[string]func(p *data.Message) (bool, *data.Message), pubsub event.IEvent, pubsubconf event.IEventConfiguration,
-	fabricarium *fabricarium.Fabricarium) *MessageProcessor {
+func NewMessageProcessor(intentions *map[string]func(p *data.Message), pubsub event.IEvent, pubsubconf event.IEventConfiguration) *MessageProcessor {
 	return &MessageProcessor{
 		intentionMap:           intentions,
 		PubSubRef:              pubsub,
@@ -31,47 +29,29 @@ func NewMessageProcessor(intentions *map[string]func(p *data.Message) (bool, *da
 //Start the blocking process to ingest and egest traffic
 func (m *MessageProcessor) Start() {
 
-	messageChannel := make(chan *data.Message)
+	if err := event.Subscribe(m.PubSubRef, func(arg2 event.IMessage) {
 
-	go func() {
-		if err := event.Subscribe(m.PubSubRef, func(arg2 event.IMessage) {
-
-			if ok, err := m.ingest(arg2, messageChannel); err != nil {
-				//Currently no handler for a failed message
+		if ok, err := m.ingest(arg2); err != nil {
+			//Currently no handler for a failed message
+		} else {
+			if ok {
+				arg2.Ack()
 			} else {
-				if ok {
-					arg2.Ack()
-				} else {
-					arg2.Nack()
-				}
+				arg2.Nack()
 			}
-		}); err != nil {
-			log.Fatal(err)
 		}
-	}()
-
-	for {
-		select {
-		case msg := <-messageChannel:
-			if msg != nil {
-				log.Println("Message processed & replied")
-				m.egest(msg)
-			} else {
-				log.Println("Message processed")
-			}
-		default:
-		}
-		time.Sleep(time.Millisecond * 500)
+	}); err != nil {
+		log.Fatal(err)
 	}
 
 }
 
 //Ingest and processes incoming messages
-func (m *MessageProcessor) ingest(message event.IMessage, messageChannel chan *data.Message) (bool, error) {
-	log.Printf("Received message of size %d\n", len(message.GetRaw()))
+func (m *MessageProcessor) ingest(message event.IMessage) (bool, error) {
+	logger.GetInstance().Log(fmt.Sprintf("Received message of size %d", len(message.GetRaw())))
 	st := &data.Message{}
 	if err := proto.Unmarshal(message.GetRaw(), st); err != nil {
-		log.Fatalln("Failed to parse message...", err)
+		logger.GetInstance().Fatal("Failed to parse message...")
 		return false, err
 	}
 
@@ -79,11 +59,7 @@ func (m *MessageProcessor) ingest(message event.IMessage, messageChannel chan *d
 
 	if fn, ok := (*im)[st.Type.String()]; ok {
 
-		if reply, parcel := fn(st); reply {
-			messageChannel <- parcel
-		} else {
-			messageChannel <- nil
-		}
+		fn(st)
 	}
 	return true, nil
 }
@@ -93,7 +69,7 @@ func (m *MessageProcessor) egest(message proto.Message) (bool, error) {
 
 	out, err := proto.Marshal(message)
 	if err != nil {
-		log.Printf("Failed to encode message %s\n", err.Error())
+		logger.GetInstance().Log(fmt.Sprintf("Failed to encode message %s\n", err.Error()))
 		return false, err
 	}
 

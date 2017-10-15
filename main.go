@@ -6,7 +6,7 @@ import (
 	event "github.com/AlexsJones/cloud-transponder/events"
 	"github.com/AlexsJones/cloud-transponder/events/pubsub"
 	"github.com/AlexsJones/kubebuilder/src/config"
-	"github.com/AlexsJones/kubebuilder/src/fabricarium"
+	"github.com/AlexsJones/kubebuilder/src/log"
 	"github.com/AlexsJones/kubebuilder/src/processor"
 )
 
@@ -28,11 +28,10 @@ func main() {
 	gconfig.SubscriptionString = conf.GCPConfiguration.SubscriptionString
 
 	if err := event.Connect(gpubsub, gconfig); err != nil {
-		log.Fatal(err)
+		logger.GetInstance().Fatal(err.Error())
 	}
-	fab := fabricarium.NewFabricarium(&fabricarium.Configuration{})
 	//Create a message processor
-	messageProcessor := processor.NewMessageProcessor(processor.NewIntentionsMapping(), gpubsub, gconfig, fab)
+	messageProcessor := processor.NewMessageProcessor(processor.NewIntentionsMapping(), gpubsub, gconfig)
 
 	messageProcessor.Start()
 }

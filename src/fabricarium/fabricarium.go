@@ -1,5 +1,7 @@
 package fabricarium
 
+import "github.com/AlexsJones/kubebuilder/src/data"
+
 //Fabricarium object that maintains a small amount of state
 type Fabricarium struct {
 	Configuration *Configuration
@@ -22,6 +24,6 @@ func NewFabricarium(conf *Configuration) *Fabricarium {
 
 }
 
-func (f *Fabricarium) ProcessBuild() {
+func (f *Fabricarium) ProcessBuild(build *data.BuildDefinition) {
 
 }
