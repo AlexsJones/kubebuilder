@@ -1,13 +1,15 @@
 vcs:
   type: git
-  name: jnxlibc
-  path: git@github.com:AlexsJones/jnxlibc.git
+  name: api-core
+  branch: master
+  path: git@github.com:SeedJobs/api-core.git
   checkoutArgs: ""
 build:
-  commands: "pwd && ls -la"
+  commands: gcloud docker -- build .
   docker:
     imageNameSuffix: vTEST
     buildArgs:
 k8s:
+  namespace: alex
   deployment: ./k8s/deployment.yaml
   imagePlaceholderReplacement: latest

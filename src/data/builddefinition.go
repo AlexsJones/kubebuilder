@@ -21,8 +21,9 @@ k8s:
 //VCS ...
 type VCS struct {
 	Type         string `yaml:"type" validate:"required"`
-	Path         string `yaml:"path"`
-	Name         string `yaml:"name"`
+	Path         string `yaml:"path" validate:"required"`
+	Name         string `yaml:"name" validate:"required"`
+	Branch       string `yaml:"branch" validate:"required"`
 	CheckoutArgs string `yaml:"checkoutArgs"`
 }
 
@@ -40,6 +41,7 @@ type Build struct {
 
 //K8s ...
 type K8s struct {
+	Namespace                   string `yaml:"namespace" validate:"required"`
 	Deployment                  string `yaml:"deployment" validate:"required"`
 	ImagePlaceholderReplacement string `yaml:"imagePlaceholderReplacement" validate:"required"`
 }

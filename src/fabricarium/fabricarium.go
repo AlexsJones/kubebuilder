@@ -11,6 +11,7 @@ import (
 	"github.com/AlexsJones/kubebuilder/src/data"
 	"github.com/AlexsJones/kubebuilder/src/fabricarium/vcs"
 	"github.com/AlexsJones/kubebuilder/src/log"
+	shortid "github.com/ventu-io/go-shortid"
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
@@ -69,35 +70,44 @@ func (f *Fabricarium) Process(build *data.BuildDefinition) {
 			return
 		}
 	}
+	sid, err := shortid.New(1, shortid.DefaultABC, 2342)
+	if err != nil {
+		panic(err)
+	}
+	//Create the mount directory if it doesn't exist
+	if _, err := os.Stat(f.Configuration.MountInformation.Path); os.IsNotExist(err) {
+		os.Mkdir(f.Configuration.MountInformation.Path, 0700)
+	}
+	//Create the sub directory for the repo if that doesnt exist
+	if _, err := os.Stat(path.Join(f.Configuration.MountInformation.Path, build.VCS.Name)); os.IsNotExist(err) {
+		os.Mkdir(path.Join(f.Configuration.MountInformation.Path, build.VCS.Name), 0700)
+	}
+
+	dynamicBuildPath := path.Join(f.Configuration.MountInformation.Path, build.VCS.Name, sid.MustGenerate())
+
+	logger.GetInstance().Log(fmt.Sprintf("Created new dynamic build path %s", dynamicBuildPath))
 	//VCS
-	if err := f.processVCS(build); err != nil {
+	if err := f.processVCS(dynamicBuildPath, build); err != nil {
 		logger.GetInstance().Log(err.Error())
 	}
 	//Build
-	if err := f.processBuild(build); err != nil {
+	if err := f.processBuild(dynamicBuildPath, build); err != nil {
 		logger.GetInstance().Log(err.Error())
 	}
 	//K8s
-	if err := f.processK8s(build); err != nil {
+	if err := f.processK8s(dynamicBuildPath, build); err != nil {
 		logger.GetInstance().Fatal(err.Error())
 		return
 	}
 }
 
-func (f *Fabricarium) processVCS(build *data.BuildDefinition) error {
-	logger.GetInstance().Log("Processing VCS")
-	//Create the mount directory if it doesn't exist
-	if _, err := os.Stat(f.Configuration.MountInformation.Path); os.IsNotExist(err) {
-		os.Mkdir(f.Configuration.MountInformation.Path, 0700)
-	}
-	if _, err := os.Stat(path.Join(f.Configuration.MountInformation.Path, build.VCS.Name)); os.IsExist(err) {
-		os.Remove(path.Join(f.Configuration.MountInformation.Path, build.VCS.Name))
-	}
+func (f *Fabricarium) processVCS(dynamicBuildPath string, build *data.BuildDefinition) error {
+	logger.GetInstance().Log("-------------------------Processing VCS-------------------------")
 
 	switch build.VCS.Type {
 	case "git":
 		g := vcs.GitVCS{}
-		if err := vcs.Fetch(g, f.Configuration.MountInformation.Path, build); err != nil {
+		if err := vcs.Fetch(g, dynamicBuildPath, build); err != nil {
 			return err
 		}
 	default:
@@ -107,41 +117,45 @@ func (f *Fabricarium) processVCS(build *data.BuildDefinition) error {
 	return nil
 }
 
-func (f *Fabricarium) processBuild(build *data.BuildDefinition) error {
-	logger.GetInstance().Log("Processing Build")
+func (f *Fabricarium) processBuild(dynamicBuildPath string, build *data.BuildDefinition) error {
+	logger.GetInstance().Log("-------------------------Processing Build-------------------------")
 
 	//Run build commands
 
 	logger.GetInstance().Log(fmt.Sprintf("/bin/sh %s", build.Build.Commands))
-	cmd := exec.Command("/bin/sh", "-c", build.Build.Commands)
-	cmd.Dir = path.Join(f.Configuration.MountInformation.Path, build.VCS.Name)
+	cmd := exec.Command("/bin/bash", "-c", build.Build.Commands)
+	cmd.Dir = dynamicBuildPath
 	cmdReader, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
+		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
+		os.Exit(1)
 	}
 
 	scanner := bufio.NewScanner(cmdReader)
 	go func() {
 		for scanner.Scan() {
-			logger.GetInstance().Log(fmt.Sprintf("%s", scanner.Text()))
+			logger.GetInstance().Log(fmt.Sprintf(scanner.Text()))
 		}
 	}()
 
 	err = cmd.Start()
 	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
 		return err
 	}
 
 	err = cmd.Wait()
 	if err != nil {
-
+		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err)
 		return err
 	}
-
 	return nil
 }
 
-func (f *Fabricarium) processK8s(build *data.BuildDefinition) error {
-	logger.GetInstance().Log("Processing K8s")
+func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefinition) error {
+	logger.GetInstance().Log("-------------------------Processing K8s-------------------------")
+
+	//TODO
+
 	return nil
 }
