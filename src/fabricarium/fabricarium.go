@@ -107,7 +107,7 @@ func (f *Fabricarium) processBuild(dynamicBuildPath string, build *data.BuildDef
 
 	dockerClient := container.NewDocker()
 
-	conatinerID, err := dockerClient.CreateContainerName(build.Build.Docker.ContainerID, build.Build.Docker.Tag, build.Build.Docker.TagReplacementValue)
+	containerID, err := dockerClient.CreateContainerName(build.Build.Docker.ContainerID, build.Build.Docker.Tag, build.Build.Docker.TagReplacementValue)
 	if err != nil {
 		return err
 	}
@@ -118,19 +118,36 @@ func (f *Fabricarium) processBuild(dynamicBuildPath string, build *data.BuildDef
 		return err
 	}
 
-	logger.GetInstance().Log(fmt.Sprintf("Using docker container %s\n", conatinerID))
+	logger.GetInstance().Log(fmt.Sprintf("Using docker container %s\n", containerID))
 	if err != nil {
 		return err
 	}
 	//Verify build
-	if ok, err := container.Exists(dockerClient, conatinerID); !ok {
+	if ok, err := container.Exists(dockerClient, containerID); !ok {
 		return err
 	}
 
 	//VerifyAge
-	if ok, err := container.YoungerThan(dockerClient, conatinerID, 5); !ok {
+	if ok, err := container.YoungerThan(dockerClient, containerID, 5); !ok {
 		return err
 	}
+
+	//tag command
+	remoteURL := strings.Replace(build.Build.Docker.Buildargs.URL, build.Build.Docker.TagReplacementValue, build.Build.Docker.Tag, -1)
+	logger.GetInstance().Log(fmt.Sprintf("Using remote URL %s", remoteURL))
+
+	tagCommand := fmt.Sprintf("gcloud docker -- tag %s %s", containerID, remoteURL)
+	//Deploy build
+	if err = sh.RunCommand(dynamicBuildPath, tagCommand); err != nil {
+		return err
+	}
+	logger.GetInstance().Log(tagCommand)
+
+	pushCommand := fmt.Sprintf("gcloud docker -- push %s", remoteURL)
+	if err = sh.RunCommand(dynamicBuildPath, pushCommand); err != nil {
+		return err
+	}
+	logger.GetInstance().Log(pushCommand)
 
 	return nil
 }
