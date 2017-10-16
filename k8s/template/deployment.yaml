@@ -19,11 +19,11 @@ spec:
           - name: auth
             mountPath: /GOOGLE_APPLICATION_CREDENTIALS.json
       volumes:
-      #  - hostPath:
-      #     path: /var/run/docker.sock
-      #    name: dockersocket
-      #  - hostPath:
-      #     path: /sys/fs/cgroup
+       - hostPath:
+          path: /var/run/docker.sock
+         name: dockersocket
+       - hostPath:
+          path: /sys/fs/cgroup
          name: system
        - name: auth
          configMap:

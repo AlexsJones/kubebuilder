@@ -29,8 +29,8 @@ type VCS struct {
 
 //Docker ...
 type Docker struct {
-	ImageNameSuffix string `yaml:"imageNameSuffix"`
-	Buildargs       string `yaml:"buildArgs"`
+	Tag       string `yaml:"tag"`
+	Buildargs string `yaml:"buildArgs"`
 }
 
 //Build ...
@@ -40,7 +40,7 @@ type Build struct {
 }
 
 //K8s ...
-type K8s struct {
+type Kubernetes struct {
 	Namespace                   string `yaml:"namespace" validate:"required"`
 	Deployment                  string `yaml:"deployment" validate:"required"`
 	ImagePlaceholderReplacement string `yaml:"imagePlaceholderReplacement" validate:"required"`
@@ -48,7 +48,7 @@ type K8s struct {
 
 //BuildDefinition ...
 type BuildDefinition struct {
-	VCS   VCS   `yaml:"vcs" validate:"required"`
-	Build Build `yaml:"build" validate:"required"`
-	K8s   K8s   `yaml:"k8s" validate:"required"`
+	VCS        VCS        `yaml:"vcs" validate:"required"`
+	Build      Build      `yaml:"build" validate:"required"`
+	Kubernetes Kubernetes `yaml:"kubernetes" validate:"required"`
 }

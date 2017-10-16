@@ -5,11 +5,13 @@ vcs:
   path: git@github.com:SeedJobs/api-core.git
   checkoutArgs: ""
 build:
-  commands: gcloud docker -- build .
+  commands: gcloud docker -- build -t api-core:latest .
   docker:
-    imageNameSuffix: vTEST
+    tag: api-core:latest
     buildArgs:
-k8s:
+kubernetes:
   namespace: alex
-  deployment: ./k8s/deployment.yaml
+  deploymentProject: git@github.com:SeedJobs/devops-kubernetes-beamery.git #optional
+  commands: ""
+  deployment: ./deployment/api-core/deployment.yaml
   imagePlaceholderReplacement: latest

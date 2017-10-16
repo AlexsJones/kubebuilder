@@ -9,3 +9,4 @@ Allowing developers to deploy temporary containers/staging code from their compu
 
 - protobuf-compiler
 - sshkey for VCS (git currently)
+- Requires a json service account file for GCP 

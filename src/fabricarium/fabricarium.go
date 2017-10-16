@@ -1,16 +1,16 @@
 package fabricarium
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path"
 
 	"github.com/AlexsJones/kubebuilder/src/data"
+	"github.com/AlexsJones/kubebuilder/src/fabricarium/container"
 	"github.com/AlexsJones/kubebuilder/src/fabricarium/vcs"
 	"github.com/AlexsJones/kubebuilder/src/log"
+	sh "github.com/AlexsJones/kubebuilder/src/shell"
 	shortid "github.com/ventu-io/go-shortid"
 	validator "gopkg.in/go-playground/validator.v9"
 )
@@ -37,22 +37,6 @@ func NewFabricarium(conf *Configuration) *Fabricarium {
 
 }
 
-/*
-vcs:
-  type: git
-  sshPath: git@github.com/AlexsJones/jnxlibc.git
-  checkoutArgs: ""
-build:
-  commands:
-    - cmake .
-    - make
-  docker:
-    imageNameSuffix: vTEST
-    buildArgs:
-k8s:
-  deployment: ./k8s/deployment.yaml
-  imagePlaceholderReplacement: latest
-*/
 //Process does the checkout and construction
 func (f *Fabricarium) Process(build *data.BuildDefinition) {
 
@@ -120,35 +104,21 @@ func (f *Fabricarium) processVCS(dynamicBuildPath string, build *data.BuildDefin
 func (f *Fabricarium) processBuild(dynamicBuildPath string, build *data.BuildDefinition) error {
 	logger.GetInstance().Log("-------------------------Processing Build-------------------------")
 
-	//Run build commands
-
-	logger.GetInstance().Log(fmt.Sprintf("/bin/sh %s", build.Build.Commands))
-	cmd := exec.Command("/bin/bash", "-c", build.Build.Commands)
-	cmd.Dir = dynamicBuildPath
-	cmdReader, err := cmd.StdoutPipe()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
-		os.Exit(1)
-	}
-
-	scanner := bufio.NewScanner(cmdReader)
-	go func() {
-		for scanner.Scan() {
-			logger.GetInstance().Log(fmt.Sprintf(scanner.Text()))
-		}
-	}()
-
-	err = cmd.Start()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
+	if err := sh.RunCommand(dynamicBuildPath, build.Build.Commands); err != nil {
 		return err
 	}
 
-	err = cmd.Wait()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err)
+	dockerClient := container.NewDocker()
+	//Verify build
+	if ok, err := container.Exists(dockerClient, build.Build.Docker.Tag); !ok {
 		return err
 	}
+
+	//VerifyAge
+	if ok, err := container.YoungerThan(dockerClient, build.Build.Docker.Tag, 5); !ok {
+		return err
+	}
+
 	return nil
 }
 
@@ -156,6 +126,10 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	logger.GetInstance().Log("-------------------------Processing K8s-------------------------")
 
 	//TODO
+
+	//namespace
+
+	//Deployment
 
 	return nil
 }
