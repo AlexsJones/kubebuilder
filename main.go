@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	event "github.com/AlexsJones/cloud-transponder/events"
@@ -8,6 +9,7 @@ import (
 	"github.com/AlexsJones/kubebuilder/src/config"
 	"github.com/AlexsJones/kubebuilder/src/log"
 	"github.com/AlexsJones/kubebuilder/src/processor"
+	validator "gopkg.in/go-playground/validator.v9"
 )
 
 func main() {
@@ -16,6 +18,20 @@ func main() {
 	conf, err := config.LoadConfiguration("config.yaml")
 	if err != nil {
 		log.Fatal(err)
+	}
+	//Validate configuration structure
+
+	validate := validator.New()
+	err = validate.Struct(conf)
+	if err != nil {
+
+		// this check is only needed when your code could produce
+		// an invalid value for validation such as interface with nil
+		// value most including myself do not usually have code like this.
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			fmt.Println(err)
+			return
+		}
 	}
 	//Create our GCP pubsub
 	gpubsub := gcloud.NewPubSub()
@@ -33,5 +49,11 @@ func main() {
 	//Create a message processor
 	messageProcessor := processor.NewMessageProcessor(processor.NewIntentionsMapping(), gpubsub, gconfig)
 
-	messageProcessor.Start()
+	//Check our debug mode for queue draining
+	if conf.KubeBuilderConfiguration.Drainqueue {
+		logger.GetInstance().Log("Draining queue")
+		messageProcessor.Drain()
+	} else {
+		messageProcessor.Start()
+	}
 }

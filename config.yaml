@@ -1,9 +1,7 @@
 kubebuilder:
   mount: ./mount
+  drainqueue: false
 gcp:
   connectionString: beamery-trials
   topic: cadium
   subscriptionString: cadium-sub
-cvs:
-  git:
-    sshKey: ""

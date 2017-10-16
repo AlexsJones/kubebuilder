@@ -5,16 +5,18 @@ import (
 	"log"
 	"sync"
 
+	"github.com/fatih/color"
 	shortid "github.com/ventu-io/go-shortid"
 )
 
 //Logger ...
 type Logger struct {
-	UUID string
+	UUID    string
+	mpColor func(a ...interface{}) string
 }
 
 func (l *Logger) prefix() string {
-	return fmt.Sprintf("[%s]", l.UUID)
+	return fmt.Sprintf("[%s]", l.mpColor(l.UUID))
 }
 
 //Log ...
@@ -24,7 +26,8 @@ func (l *Logger) Log(args ...string) {
 
 //Fatal ...
 func (l *Logger) Fatal(args ...string) {
-	log.Fatalf("%s:%s", l.prefix(), args)
+	red := color.New(color.FgRed).SprintFunc()
+	log.Fatalf("%s:%s", l.prefix(), red(args))
 }
 
 var instance *Logger
@@ -33,11 +36,12 @@ var once sync.Once
 //GetInstance of logger singleton
 func GetInstance() *Logger {
 	once.Do(func() {
+		green := color.New(color.FgGreen).SprintFunc()
 		sid, err := shortid.New(1, shortid.DefaultABC, 2342)
 		if err != nil {
 			panic(err)
 		}
-		instance = &Logger{UUID: sid.MustGenerate()}
+		instance = &Logger{UUID: sid.MustGenerate(), mpColor: green}
 	})
 	return instance
 }

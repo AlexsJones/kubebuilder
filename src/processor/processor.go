@@ -46,6 +46,15 @@ func (m *MessageProcessor) Start() {
 
 }
 
+func (m *MessageProcessor) Drain() {
+	for {
+		event.Subscribe(m.PubSubRef, func(arg2 event.IMessage) {
+			logger.GetInstance().Log("Acking message in queue drain")
+			arg2.Ack()
+		})
+	}
+}
+
 //Ingest and processes incoming messages
 func (m *MessageProcessor) ingest(message event.IMessage) (bool, error) {
 	logger.GetInstance().Log(fmt.Sprintf("Received message of size %d", len(message.GetRaw())))
@@ -69,7 +78,7 @@ func (m *MessageProcessor) egest(message proto.Message) (bool, error) {
 
 	out, err := proto.Marshal(message)
 	if err != nil {
-		logger.GetInstance().Log(fmt.Sprintf("Failed to encode message %s\n", err.Error()))
+		logger.GetInstance().Log(fmt.Sprintf("Failed to encode message %s", err.Error()))
 		return false, err
 	}
 
