@@ -5,13 +5,17 @@ vcs:
   path: git@github.com:SeedJobs/api-core.git
   checkoutArgs: ""
 build:
-  commands: gcloud docker -- build -t api-core:latest .
+  commands: gcloud docker -- build --no-cache=true -t api-core:TAGNAME .
   docker:
-    tag: api-core:latest
+    tag: latest
+    tagReplacementValue: TAGNAME
+    containerID: api-core:TAGNAME
     buildArgs:
+      remote:
+      url: us.gcr.io/beamery-trials/api-core:TAGNAME
 kubernetes:
   namespace: alex
-  deploymentProject: git@github.com:SeedJobs/devops-kubernetes-beamery.git #optional
+  deploymentProject: git@github.com:SeedJobs/devops-kubernetes-beamery.git
   commands: ""
   deployment: ./deployment/api-core/deployment.yaml
   imagePlaceholderReplacement: latest

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/AlexsJones/kubebuilder/src/data"
 	"github.com/AlexsJones/kubebuilder/src/fabricarium/container"
@@ -104,18 +105,30 @@ func (f *Fabricarium) processVCS(dynamicBuildPath string, build *data.BuildDefin
 func (f *Fabricarium) processBuild(dynamicBuildPath string, build *data.BuildDefinition) error {
 	logger.GetInstance().Log("-------------------------Processing Build-------------------------")
 
-	if err := sh.RunCommand(dynamicBuildPath, build.Build.Commands); err != nil {
+	dockerClient := container.NewDocker()
+
+	conatinerID, err := dockerClient.CreateContainerName(build.Build.Docker.ContainerID, build.Build.Docker.Tag, build.Build.Docker.TagReplacementValue)
+	if err != nil {
+		return err
+	}
+	//Lets modify the build commands if it references our replacement value
+	buildCommands := strings.Replace(build.Build.Commands, build.Build.Docker.TagReplacementValue, build.Build.Docker.Tag, -1)
+
+	if err = sh.RunCommand(dynamicBuildPath, buildCommands); err != nil {
 		return err
 	}
 
-	dockerClient := container.NewDocker()
+	logger.GetInstance().Log(fmt.Sprintf("Using docker container %s\n", conatinerID))
+	if err != nil {
+		return err
+	}
 	//Verify build
-	if ok, err := container.Exists(dockerClient, build.Build.Docker.Tag); !ok {
+	if ok, err := container.Exists(dockerClient, conatinerID); !ok {
 		return err
 	}
 
 	//VerifyAge
-	if ok, err := container.YoungerThan(dockerClient, build.Build.Docker.Tag, 5); !ok {
+	if ok, err := container.YoungerThan(dockerClient, conatinerID, 5); !ok {
 		return err
 	}
 

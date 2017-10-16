@@ -3,19 +3,25 @@ package data
 /*
 vcs:
   type: git
-  sshPath: git@github.com/AlexsJones/jnxlibc.git
+  name: api-core
+  branch: master
+  path: git@github.com:SeedJobs/api-core.git
   checkoutArgs: ""
 build:
-  commands:
-    - cmake .
-    - make
+  commands: gcloud docker -- build --no-cache=true -t api-core:TAGNAME .
   docker:
-    imageNameSuffix: vTEST
+    tag: latest
+    tagReplacementValue: TAGNAME
+    containerID: api-core:TAGNAME
     buildArgs:
-k8s:
-  deployment: ./k8s/deployment.yaml
+      remote:
+      url: us.gcr.io/beamery-trials/api-core:TAGNAME
+kubernetes:
+  namespace: alex
+  deploymentProject: git@github.com:SeedJobs/devops-kubernetes-beamery.git
+  commands: ""
+  deployment: ./deployment/api-core/deployment.yaml
   imagePlaceholderReplacement: latest
-
 */
 
 //VCS ...
@@ -29,8 +35,16 @@ type VCS struct {
 
 //Docker ...
 type Docker struct {
-	Tag       string `yaml:"tag"`
-	Buildargs string `yaml:"buildArgs"`
+	Tag                 string          `yaml:"tag"`
+	TagReplacementValue string          `yaml:"tagReplacementValue"`
+	Buildargs           DockerBuildArgs `yaml:"buildArgs"`
+	ContainerID         string          `yaml:"containerID"`
+}
+
+//DockerBuildArgs ...
+type DockerBuildArgs struct {
+	Remote string `yaml:"remote"`
+	URL    string `yaml:"url"`
 }
 
 //Build ...
@@ -39,7 +53,7 @@ type Build struct {
 	Docker   Docker `yaml:"docker"`
 }
 
-//K8s ...
+//Kubernetes ...
 type Kubernetes struct {
 	Namespace                   string `yaml:"namespace" validate:"required"`
 	Deployment                  string `yaml:"deployment" validate:"required"`

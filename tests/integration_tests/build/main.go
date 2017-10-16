@@ -69,5 +69,5 @@ func main() {
 
 	event.Publish(gpubsub, out)
 
-	time.Sleep(time.Minute)
+	time.Sleep(time.Second * 10)
 }
