@@ -11,6 +11,9 @@ import (
 kubebuilder:
   mount: ./mount
   purgepubsub: true
+	bypassVCS: true
+	bypassBuild: true
+	bypassKubernetes: false
 gcp:
   connectionString: beamery-trials
   topic: cadium
@@ -18,21 +21,30 @@ gcp:
 */
 //Configuration representation of yaml
 type Configuration struct {
-	GCPConfiguration         GCPConfiguration         `yaml:"gcp"`
+	PubSubConfiguration      PubSubConfiguration      `yaml:"pubsub" validate:"required"`
 	KubeBuilderConfiguration KubeBuilderConfiguration `yaml:"kubebuilder" validate:"required"`
+	KubernetesConfiguration  KubernetesConfiguration  `yaml:"kubernetes" validate:"required"`
 }
 
 //KubeBuilderConfiguration applicatoin configuration
 type KubeBuilderConfiguration struct {
-	Mount      string `yaml:"mount" validate:"required"`
-	Drainqueue bool   `yaml:drainqueue validate:"required"`
+	Mount            string `yaml:"mount" validate:"required"`
+	Drainqueue       bool   `yaml:"drainqueue" validate:"required"`
+	BypassVCS        bool   `yaml:"bypassVCS" validate:"required"`
+	BypassBuild      bool   `yaml:"bypassBuild" validate:"required"`
+	BypassKubernetes bool   `yaml:"bypassKubernetes" validate:"required"`
 }
 
-//GCPConfiguration object
-type GCPConfiguration struct {
+//PubSubConfiguration object
+type PubSubConfiguration struct {
 	ConnectionString   string `yaml:"connectionString"`
 	Topic              string `yaml:"topic"`
 	SubscriptionString string `yaml:"subscriptionString"`
+}
+
+//KubernetesConfiguration ...
+type KubernetesConfiguration struct {
+	InCluster bool `yaml:"incluster" validate:"required"`
 }
 
 //LoadConfiguration ...

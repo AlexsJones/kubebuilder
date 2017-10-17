@@ -5,6 +5,7 @@ import (
 	"log"
 
 	event "github.com/AlexsJones/cloud-transponder/events"
+	"github.com/AlexsJones/kubebuilder/src/config"
 	"github.com/AlexsJones/kubebuilder/src/data"
 	"github.com/AlexsJones/kubebuilder/src/log"
 	"github.com/golang/protobuf/proto"
@@ -12,17 +13,20 @@ import (
 
 //MessageProcessor object definition
 type MessageProcessor struct {
-	intentionMap           *map[string]func(p *data.Message)
-	PubSubRef              event.IEvent
-	PubSubConfigurationRef event.IEventConfiguration
+	intentionMap             *map[string]func(appConfig *config.Configuration, p *data.Message)
+	PubSubRef                event.IEvent
+	PubSubConfigurationRef   event.IEventConfiguration
+	ApplicationConfiguration *config.Configuration
 }
 
 //NewMessageProcessor creates a new MessageProcessor object
-func NewMessageProcessor(intentions *map[string]func(p *data.Message), pubsub event.IEvent, pubsubconf event.IEventConfiguration) *MessageProcessor {
+func NewMessageProcessor(intentions *map[string]func(appConfig *config.Configuration, p *data.Message), pubsub event.IEvent, pubsubconf event.IEventConfiguration,
+	appConfig *config.Configuration) *MessageProcessor {
 	return &MessageProcessor{
-		intentionMap:           intentions,
-		PubSubRef:              pubsub,
-		PubSubConfigurationRef: pubsubconf,
+		intentionMap:             intentions,
+		PubSubRef:                pubsub,
+		PubSubConfigurationRef:   pubsubconf,
+		ApplicationConfiguration: appConfig,
 	}
 }
 
@@ -68,7 +72,7 @@ func (m *MessageProcessor) ingest(message event.IMessage) (bool, error) {
 
 	if fn, ok := (*im)[st.Type.String()]; ok {
 
-		fn(st)
+		fn(m.ApplicationConfiguration, st)
 	}
 	return true, nil
 }

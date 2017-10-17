@@ -7,8 +7,10 @@ import (
 	"path"
 	"strings"
 
+	"github.com/AlexsJones/kubebuilder/src/config"
 	"github.com/AlexsJones/kubebuilder/src/data"
 	"github.com/AlexsJones/kubebuilder/src/fabricarium/container"
+	"github.com/AlexsJones/kubebuilder/src/fabricarium/platform"
 	"github.com/AlexsJones/kubebuilder/src/fabricarium/vcs"
 	"github.com/AlexsJones/kubebuilder/src/log"
 	sh "github.com/AlexsJones/kubebuilder/src/shell"
@@ -28,7 +30,8 @@ type Mount struct {
 
 //Configuration holds configuration information
 type Configuration struct {
-	MountInformation *Mount
+	MountInformation         *Mount
+	ApplicationConfiguration *config.Configuration
 }
 
 //NewFabricarium creates the builder that receivees YAML build scripts
@@ -72,17 +75,30 @@ func (f *Fabricarium) Process(build *data.BuildDefinition) {
 
 	logger.GetInstance().Log(fmt.Sprintf("Created new dynamic build path %s", dynamicBuildPath))
 	//VCS
-	if err := f.processVCS(dynamicBuildPath, build); err != nil {
-		logger.GetInstance().Log(err.Error())
+
+	if f.Configuration.ApplicationConfiguration.KubeBuilderConfiguration.BypassVCS {
+		logger.GetInstance().Info("Bypassing VCS")
+	} else {
+		if err := f.processVCS(dynamicBuildPath, build); err != nil {
+			logger.GetInstance().Log(err.Error())
+		}
 	}
 	//Build
-	if err := f.processBuild(dynamicBuildPath, build); err != nil {
-		logger.GetInstance().Log(err.Error())
+	if f.Configuration.ApplicationConfiguration.KubeBuilderConfiguration.BypassBuild {
+		logger.GetInstance().Info("Bypassing Build")
+	} else {
+		if err := f.processBuild(dynamicBuildPath, build); err != nil {
+			logger.GetInstance().Log(err.Error())
+		}
 	}
 	//K8s
-	if err := f.processK8s(dynamicBuildPath, build); err != nil {
-		logger.GetInstance().Fatal(err.Error())
-		return
+	if f.Configuration.ApplicationConfiguration.KubeBuilderConfiguration.BypassKubernetes {
+		logger.GetInstance().Info("Bypassing Kubernetes")
+	} else {
+		if err := f.processK8s(dynamicBuildPath, build); err != nil {
+			logger.GetInstance().Fatal(err.Error())
+			return
+		}
 	}
 }
 
@@ -158,6 +174,7 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	//TODO
 
 	//namespace
+	_, _ = platform.NewKubernetes()
 
 	//Deployment
 

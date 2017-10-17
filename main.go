@@ -39,15 +39,15 @@ func main() {
 	//Create the GCP Pubsub configuration
 	gconfig := gcloud.NewPubSubConfiguration()
 
-	gconfig.Topic = conf.GCPConfiguration.Topic
-	gconfig.ConnectionString = conf.GCPConfiguration.ConnectionString
-	gconfig.SubscriptionString = conf.GCPConfiguration.SubscriptionString
+	gconfig.Topic = conf.PubSubConfiguration.Topic
+	gconfig.ConnectionString = conf.PubSubConfiguration.ConnectionString
+	gconfig.SubscriptionString = conf.PubSubConfiguration.SubscriptionString
 
 	if err := event.Connect(gpubsub, gconfig); err != nil {
 		logger.GetInstance().Fatal(err.Error())
 	}
 	//Create a message processor
-	messageProcessor := processor.NewMessageProcessor(processor.NewIntentionsMapping(), gpubsub, gconfig)
+	messageProcessor := processor.NewMessageProcessor(processor.NewIntentionsMapping(), gpubsub, gconfig, conf)
 
 	//Check our debug mode for queue draining
 	if conf.KubeBuilderConfiguration.Drainqueue {

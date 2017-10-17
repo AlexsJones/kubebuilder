@@ -11,12 +11,18 @@ import (
 
 //Logger ...
 type Logger struct {
-	UUID    string
-	mpColor func(a ...interface{}) string
+	UUID      string
+	mpColor   func(a ...interface{}) string
+	infoColor func(a ...interface{}) string
 }
 
 func (l *Logger) prefix() string {
 	return fmt.Sprintf("[%s]", l.mpColor(l.UUID))
+}
+
+//Info for program alerts more than anything else
+func (l *Logger) Info(args ...string) {
+	log.Printf(fmt.Sprintf("%s:%s", l.prefix(), l.infoColor(args)))
 }
 
 //Log ...
@@ -37,11 +43,12 @@ var once sync.Once
 func GetInstance() *Logger {
 	once.Do(func() {
 		green := color.New(color.FgGreen).SprintFunc()
+		blue := color.New(color.FgBlue).SprintFunc()
 		sid, err := shortid.New(1, shortid.DefaultABC, 2342)
 		if err != nil {
 			panic(err)
 		}
-		instance = &Logger{UUID: sid.MustGenerate(), mpColor: green}
+		instance = &Logger{UUID: sid.MustGenerate(), mpColor: green, infoColor: blue}
 	})
 	return instance
 }

@@ -1,7 +1,12 @@
 kubebuilder:
   mount: ./mount
   drainqueue: false
-gcp:
+  bypassVCS: true
+  bypassBuild: true
+  bypassKubernetes: false
+pubsub:
   connectionString: beamery-trials
   topic: cadium
   subscriptionString: cadium-sub
+kubernetes:
+  incluster: false #With this set to false out of cluster configuration will be used, don't edit this unless you know what you're doing

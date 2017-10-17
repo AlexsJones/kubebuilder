@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/AlexsJones/kubebuilder/src/config"
 	"github.com/AlexsJones/kubebuilder/src/data"
 	"github.com/AlexsJones/kubebuilder/src/fabricarium"
 	"github.com/AlexsJones/kubebuilder/src/log"
@@ -12,10 +13,10 @@ import (
 )
 
 //NewIntentionsMapping Creates the intentions mappings...
-func NewIntentionsMapping() *map[string]func(*data.Message) {
+func NewIntentionsMapping() *map[string]func(*config.Configuration, *data.Message) {
 
-	return &map[string]func(*data.Message){
-		"SYN": func(p *data.Message) {
+	return &map[string]func(*config.Configuration, *data.Message){
+		"SYN": func(appConfig *config.Configuration, p *data.Message) {
 			logger.GetInstance().Log("Receieved SYN intention")
 
 			if p.Context.String() == "" {
@@ -26,18 +27,18 @@ func NewIntentionsMapping() *map[string]func(*data.Message) {
 			reply.Type = data.Message_ACK
 
 		},
-		"ACK": func(p *data.Message) {
+		"ACK": func(appConfig *config.Configuration, p *data.Message) {
 
 			logger.GetInstance().Log(fmt.Sprintf("Receieved ACK intention with context %s", p.Context.Value))
 
 		},
-		"STATECHANGE": func(p *data.Message) {
+		"STATECHANGE": func(appConfig *config.Configuration, p *data.Message) {
 			logger.GetInstance().Log("Receiving statechange intention")
 			logger.GetInstance().Log("--State Change--")
 			logger.GetInstance().Log(fmt.Sprintf("%v", p.Payload))
 			logger.GetInstance().Log("----------------")
 		},
-		"BUILD": func(p *data.Message) {
+		"BUILD": func(appConfig *config.Configuration, p *data.Message) {
 			logger.GetInstance().Log("Receiving build intention")
 
 			if p.Payload == "" {
@@ -49,7 +50,6 @@ func NewIntentionsMapping() *map[string]func(*data.Message) {
 				log.Println("decode error:", err)
 
 			}
-
 			builddef := data.BuildDefinition{}
 
 			err = yaml.Unmarshal(decoded, &builddef)
@@ -58,7 +58,7 @@ func NewIntentionsMapping() *map[string]func(*data.Message) {
 			}
 			logger.GetInstance().Log(fmt.Sprintf("%v", builddef))
 
-			fab := fabricarium.NewFabricarium(&fabricarium.Configuration{MountInformation: &fabricarium.Mount{Path: "./mount"}})
+			fab := fabricarium.NewFabricarium(&fabricarium.Configuration{MountInformation: &fabricarium.Mount{Path: appConfig.KubeBuilderConfiguration.Mount}, ApplicationConfiguration: appConfig})
 
 			fab.Process(&builddef)
 		},
