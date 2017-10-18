@@ -1,11 +1,16 @@
 # kubebuilder
 
-A developer life improvement for kubernetes.
-
-Allowing developers to deploy temporary containers/staging code from their computer to a k8s cluster with ease.
+![Imgur](https://i.imgur.com/xxDRsik.jpg)
 
 
-## Requirements
+A kubernetes deployment that allows developers to push their repositories via pubsub and have it deployed.
+The purpose here is to let multiple developers have their own namespaces in a k8s cluster to work on, shared by a common ingress.
+
+---
+
+## Development
+
+### Requirements
 
 - protobuf-compiler
 - sshkey for VCS (git currently)
