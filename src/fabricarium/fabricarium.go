@@ -174,7 +174,7 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	//TODO
 
 	//namespace
-	_, _ = platform.NewKubernetes()
+	_, _ = platform.NewKubernetes(f.Configuration.ApplicationConfiguration.KubernetesConfiguration.InCluster)
 
 	//Deployment
 

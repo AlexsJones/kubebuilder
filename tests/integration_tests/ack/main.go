@@ -24,8 +24,8 @@ func main() {
 	//Create the GCP Pubsub configuration
 	gconfig := gcloud.NewPubSubConfiguration()
 
-	gconfig.Topic = conf.GCPConfiguration.Topic
-	gconfig.ConnectionString = conf.GCPConfiguration.ConnectionString
+	gconfig.Topic = conf.PubSubConfiguration.Topic
+	gconfig.ConnectionString = conf.PubSubConfiguration.ConnectionString
 
 	if err = event.Connect(gpubsub, gconfig); err != nil {
 		log.Fatal(err)
