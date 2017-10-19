@@ -44,7 +44,8 @@ type PubSubConfiguration struct {
 
 //KubernetesConfiguration ...
 type KubernetesConfiguration struct {
-	InCluster bool `yaml:"incluster" validate:"required"`
+	InCluster bool   `yaml:"incluster" validate:"required"`
+	MasterURL string `yaml:"masterurl" validate:"required"`
 }
 
 //LoadConfiguration ...

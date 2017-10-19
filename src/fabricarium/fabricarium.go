@@ -100,6 +100,7 @@ func (f *Fabricarium) Process(build *data.BuildDefinition) {
 			return
 		}
 	}
+	logger.GetInstance().Info("Fabricarium run complete")
 }
 
 func (f *Fabricarium) processVCS(dynamicBuildPath string, build *data.BuildDefinition) error {
@@ -174,9 +175,15 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	//TODO
 
 	//namespace
-	_, _ = platform.NewKubernetes(f.Configuration.ApplicationConfiguration.KubernetesConfiguration.InCluster)
-
+	k8sinterface, err := platform.NewKubernetes(f.Configuration.ApplicationConfiguration.KubernetesConfiguration.MasterURL,
+		f.Configuration.ApplicationConfiguration.KubernetesConfiguration.InCluster)
+	if err != nil {
+		return err
+	}
 	//Deployment
+	if err := k8sinterface.CreateNamespace(build.Kubernetes.Namespace); err != nil {
+		return err
+	}
 
 	return nil
 }

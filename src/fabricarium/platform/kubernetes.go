@@ -7,6 +7,8 @@ import (
 	"github.com/AlexsJones/kubebuilder/src/log"
 	"k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
+	//This is required for gcp auth provider scope
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -18,7 +20,7 @@ type Kubernetes struct {
 }
 
 //NewKubernetes object
-func NewKubernetes(inclusterConfig bool) (*Kubernetes, error) {
+func NewKubernetes(masterURL string, inclusterConfig bool) (*Kubernetes, error) {
 
 	//InCluster...
 	var config *rest.Config
@@ -38,7 +40,7 @@ func NewKubernetes(inclusterConfig bool) (*Kubernetes, error) {
 			return os.Getenv("USERPROFILE")
 		}(), ".kube", "config")
 		// use the current context in kubeconfig
-		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		config, err = clientcmd.BuildConfigFromFlags(masterURL, kubeconfig)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -55,6 +57,7 @@ func NewKubernetes(inclusterConfig bool) (*Kubernetes, error) {
 func (k *Kubernetes) CreateNamespace(namespace string) error {
 	ns := &v1.Namespace{}
 	ns.SetNamespace(namespace)
+	ns.SetGenerateName(namespace)
 	_, err := k.clientset.CoreV1().Namespaces().Create(ns)
 	return err
 }
