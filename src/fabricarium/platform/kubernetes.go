@@ -54,10 +54,10 @@ func NewKubernetes(masterURL string, inclusterConfig bool) (*Kubernetes, error) 
 }
 
 //CreateNamespace within kubernetes
-func (k *Kubernetes) CreateNamespace(namespace string) error {
+func (k *Kubernetes) CreateNamespace(namespace string) (*v1.Namespace, error) {
 	ns := &v1.Namespace{}
 	ns.SetNamespace(namespace)
 	ns.SetGenerateName(namespace)
-	_, err := k.clientset.CoreV1().Namespaces().Create(ns)
-	return err
+	ns, err := k.clientset.CoreV1().Namespaces().Create(ns)
+	return ns, err
 }

@@ -181,9 +181,14 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 		return err
 	}
 	//Deployment
-	if err := k8sinterface.CreateNamespace(build.Kubernetes.Namespace); err != nil {
+
+	//Check if NS exists else...
+
+	ns, err := k8sinterface.CreateNamespace(build.Kubernetes.Namespace)
+	if err != nil {
 		return err
 	}
+	logger.GetInstance().Log(fmt.Sprintf("Created nmespace %s", ns.GetName()))
 
 	return nil
 }
