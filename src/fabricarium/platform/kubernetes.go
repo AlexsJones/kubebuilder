@@ -8,6 +8,7 @@ import (
 	"k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	//This is required for gcp auth provider scope
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -55,9 +56,21 @@ func NewKubernetes(masterURL string, inclusterConfig bool) (*Kubernetes, error) 
 
 //CreateNamespace within kubernetes
 func (k *Kubernetes) CreateNamespace(namespace string) (*v1.Namespace, error) {
+	if ns, err := k.GetNamespace(namespace); err == nil {
+		logger.GetInstance().Log("Found existing namespace")
+		return ns, err
+	}
 	ns := &v1.Namespace{}
-	ns.SetNamespace(namespace)
-	ns.SetGenerateName(namespace)
+
+	ns.SetName(namespace)
+
 	ns, err := k.clientset.CoreV1().Namespaces().Create(ns)
+	return ns, err
+}
+
+//GetNamespace within kubernetes
+func (k *Kubernetes) GetNamespace(namespace string) (*v1.Namespace, error) {
+
+	ns, err := k.clientset.CoreV1().Namespaces().Get(namespace, meta_v1.GetOptions{})
 	return ns, err
 }

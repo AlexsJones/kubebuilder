@@ -188,7 +188,7 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	if err != nil {
 		return err
 	}
-	logger.GetInstance().Log(fmt.Sprintf("Created nmespace %s", ns.GetName()))
+	logger.GetInstance().Log(fmt.Sprintf("Created namespace %s", ns.GetName()))
 
 	return nil
 }

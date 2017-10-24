@@ -9,4 +9,5 @@ pubsub:
   topic: cadium
   subscriptionString: cadium-sub
 kubernetes:
+  masterurl: https://35.195.149.148
   incluster: false #With this set to false out of cluster configuration will be used, don't edit this unless you know what you're doing
