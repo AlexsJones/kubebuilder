@@ -5,11 +5,11 @@ import (
 	"log"
 
 	"github.com/AlexsJones/kubebuilder/src/log"
-
 	"k8s.io/api/apps/v1beta1"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
 )
@@ -37,8 +37,8 @@ type deployOperation struct {
 	port  int
 }
 
-func (op *deployOperation) Do(c *kubernetes.Clientset) {
-	if err := op.doDeployment(c); err != nil {
+func (op *deployOperation) Do(c *kubernetes.Clientset, namespace string) {
+	if err := op.doDeployment(c, namespace); err != nil {
 		log.Fatal(err)
 	}
 
@@ -47,16 +47,32 @@ func (op *deployOperation) Do(c *kubernetes.Clientset) {
 	}
 }
 
-func (op *deployOperation) doDeployment(c *kubernetes.Clientset) error {
+func (op *deployOperation) doDeployment(c *kubernetes.Clientset, namespace string) error {
 	appName := op.name
 
-	// Define Deployments spec.
+	/*
+	   // Deployment enables declarative updates for Pods and ReplicaSets.
+	   type Deployment struct {
+	   	metav1.TypeMeta `json:",inline"`
+	   	// Standard object metadata.
+	   	// +optional
+	   	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+
+	   	// Specification of the desired behavior of the Deployment.
+	   	// +optional
+	   	Spec DeploymentSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+
+	   	// Most recently observed status of the Deployment.
+	   	// +optional
+	   	Status DeploymentStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
+	   }
+	*/
 	deploySpec := &v1beta1.Deployment{
-		TypeMeta: unversioned.TypeMeta{
+		TypeMeta: metav1.TypeMeta{
 			Kind:       "Deployment",
 			APIVersion: "extensions/v1beta1",
 		},
-		ObjectMeta: v1.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name: appName,
 		},
 		Spec: v1beta1.DeploymentSpec{
@@ -76,7 +92,7 @@ func (op *deployOperation) doDeployment(c *kubernetes.Clientset) error {
 			},
 			RevisionHistoryLimit: int32p(10),
 			Template: v1.PodTemplateSpec{
-				ObjectMeta: v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:   appName,
 					Labels: map[string]string{"app": appName},
 				},
@@ -105,7 +121,7 @@ func (op *deployOperation) doDeployment(c *kubernetes.Clientset) error {
 	}
 
 	// Implement deployment update-or-create semantics.
-	deploy := c.Extensions().Deployments(namespace)
+	d := c.Extensions().Deployments(namespace)
 	_, err := deploy.Update(deploySpec)
 	switch {
 	case err == nil:
@@ -128,11 +144,11 @@ func (op *deployOperation) doService(c *kubernetes.Clientset) error {
 
 	// Define service spec.
 	serviceSpec := &v1.Service{
-		TypeMeta: unversioned.TypeMeta{
+		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
 			APIVersion: "v1",
 		},
-		ObjectMeta: v1.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name: appName,
 		},
 		Spec: v1.ServiceSpec{
