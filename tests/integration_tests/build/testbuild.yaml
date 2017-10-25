@@ -16,7 +16,9 @@ build:
 kubernetes:
   masterurl: https://35.195.113.84
   namespace: alex
+  deploymentProjectProtocol: git
   deploymentProject: git@github.com:SeedJobs/devops-kubernetes-beamery.git
-  commands: ""
+  preDeployCommands:
+  postDeployCommands:
   deployment: ./deployment/api-core/deployment.yaml
   imagePlaceholderReplacement: latest

@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/AlexsJones/kubebuilder/src/data"
 	"github.com/AlexsJones/kubebuilder/src/log"
 	"k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -73,4 +74,10 @@ func (k *Kubernetes) GetNamespace(namespace string) (*v1.Namespace, error) {
 
 	ns, err := k.clientset.CoreV1().Namespaces().Get(namespace, meta_v1.GetOptions{})
 	return ns, err
+}
+
+func (k *Kubernetes) CreateDeployment(build *data.BuildDefinition) error {
+	var op operation
+
+	return nil
 }

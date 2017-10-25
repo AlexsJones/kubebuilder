@@ -57,6 +57,10 @@ type Build struct {
 type Kubernetes struct {
 	Namespace                   string `yaml:"namespace" validate:"required"`
 	Deployment                  string `yaml:"deployment" validate:"required"`
+	PreDeployCommands           string `yaml:"preDeployCommands"`
+	PostDeployCommands          string `yaml:"postDeployCommands"`
+	DeploymentProjectProtocol   string `yaml:"deploymentProjectProtocol"`
+	DeploymentProject           string `yaml:"deploymentProject"`
 	ImagePlaceholderReplacement string `yaml:"imagePlaceholderReplacement" validate:"required"`
 }
 
