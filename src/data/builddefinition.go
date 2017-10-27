@@ -5,23 +5,26 @@ vcs:
   type: git
   name: api-core
   branch: master
-  path: git@github.com:SeedJobs/api-core.git
+  path: git@github.com:BLAH/api-example.git
   checkoutArgs: ""
 build:
-  commands: gcloud docker -- build --no-cache=true -t api-core:TAGNAME .
+  commands: gcloud docker -- build --no-cache=true -t api-example:TAGNAME .
   docker:
     tag: latest
     tagReplacementValue: TAGNAME
-    containerID: api-core:TAGNAME
+    containerID: api-example:TAGNAME
     buildArgs:
       remote:
-      url: us.gcr.io/beamery-trials/api-core:TAGNAME
+      url: us.gcr.io/beamery-trials/api-example:TAGNAME
 kubernetes:
+  masterurl:
   namespace: alex
-  deploymentProject: git@github.com:SeedJobs/devops-kubernetes-beamery.git
-  commands: ""
-  deployment: ./deployment/api-core/deployment.yaml
-  imagePlaceholderReplacement: latest
+  yaml: |
+    "apiVersion: extensions/v1beta1
+    kind: Deployment
+    metadata:
+      name: THISISBROKEN
+      namespace: THISCANTBETRUE"
 */
 
 //VCS ...
@@ -55,13 +58,8 @@ type Build struct {
 
 //Kubernetes ...
 type Kubernetes struct {
-	Namespace                   string `yaml:"namespace" validate:"required"`
-	Deployment                  string `yaml:"deployment" validate:"required"`
-	PreDeployCommands           string `yaml:"preDeployCommands"`
-	PostDeployCommands          string `yaml:"postDeployCommands"`
-	DeploymentProjectProtocol   string `yaml:"deploymentProjectProtocol"`
-	DeploymentProject           string `yaml:"deploymentProject"`
-	ImagePlaceholderReplacement string `yaml:"imagePlaceholderReplacement" validate:"required"`
+	Namespace string `yaml:"namespace" validate:"required"`
+	YAML      string `yaml:"yaml"`
 }
 
 //BuildDefinition ...

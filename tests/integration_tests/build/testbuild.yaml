@@ -14,11 +14,10 @@ build:
       remote:
       url: us.gcr.io/beamery-trials/api-core:TAGNAME
 kubernetes:
-  masterurl: https://35.195.113.84
   namespace: alex
-  deploymentProjectProtocol: git
-  deploymentProject: git@github.com:SeedJobs/devops-kubernetes-beamery.git
-  preDeployCommands:
-  postDeployCommands:
-  deployment: ./deployment/api-core/deployment.yaml
-  imagePlaceholderReplacement: latest
+  yaml: |
+    "apiVersion: extensions/v1beta1
+    kind: Deployment
+    metadata:
+      name: THISISBROKEN
+      namespace: THISCANTBETRUE"

@@ -1,6 +1,7 @@
 package platform
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/AlexsJones/kubebuilder/src/log"
 	"k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/scheme"
 	//This is required for gcp auth provider scope
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -55,6 +57,21 @@ func NewKubernetes(masterURL string, inclusterConfig bool) (*Kubernetes, error) 
 	return &Kubernetes{clientset: clientset, config: config}, nil
 }
 
+//ValidateDeployment from deserialisation of YAML
+func (k *Kubernetes) ValidateDeployment(build *data.BuildDefinition) (bool, error) {
+
+	logger.GetInstance().Log("Attempting serialisation of YAML")
+
+	d := scheme.Codecs.UniversalDeserializer()
+	_, _, err := d.Decode([]byte(build.Kubernetes.YAML), nil, nil)
+	if err != nil {
+		logger.GetInstance().Fatal(fmt.Sprintf("could not decode yaml: %s\n%s", build.Kubernetes.YAML, err))
+		return false, err
+	}
+
+	return false, nil
+}
+
 //CreateNamespace within kubernetes
 func (k *Kubernetes) CreateNamespace(namespace string) (*v1.Namespace, error) {
 	if ns, err := k.GetNamespace(namespace); err == nil {
@@ -77,7 +94,6 @@ func (k *Kubernetes) GetNamespace(namespace string) (*v1.Namespace, error) {
 }
 
 func (k *Kubernetes) CreateDeployment(build *data.BuildDefinition) error {
-	var op operation
 
 	return nil
 }
