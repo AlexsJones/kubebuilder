@@ -15,9 +15,9 @@ build:
       url: us.gcr.io/beamery-trials/api-core:TAGNAME
 kubernetes:
   namespace: alex
-  yaml: |
-    "apiVersion: extensions/v1beta1
+  yaml: |- 
+    apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
       name: THISISBROKEN
-      namespace: THISCANTBETRUE"
+      namespace: THISCANTBETRUE

@@ -40,7 +40,7 @@ func main() {
 	st.Type = data.Message_BUILD
 
 	//Load yaml
-	raw, err := ioutil.ReadFile("./tests/integration_tests/build/testbuild.yaml")
+	raw, err := ioutil.ReadFile("./tests/integration_tests/build/.kubebuilder/testbuild.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}

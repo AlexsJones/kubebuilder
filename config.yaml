@@ -3,7 +3,7 @@ kubebuilder:
   drainqueue: false
   bypassVCS: true
   bypassBuild: true
-  bypassKubernetes: true
+  bypassKubernetes: false
 pubsub:
   connectionString: beamery-trials
   topic: cadium

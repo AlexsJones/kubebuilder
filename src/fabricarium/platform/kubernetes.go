@@ -65,11 +65,11 @@ func (k *Kubernetes) ValidateDeployment(build *data.BuildDefinition) (bool, erro
 	d := scheme.Codecs.UniversalDeserializer()
 	_, _, err := d.Decode([]byte(build.Kubernetes.YAML), nil, nil)
 	if err != nil {
-		logger.GetInstance().Fatal(fmt.Sprintf("could not decode yaml: %s\n%s", build.Kubernetes.YAML, err))
+		logger.GetInstance().Log(fmt.Sprintf("could not decode yaml: %s\n%s", build.Kubernetes.YAML, err))
 		return false, err
 	}
-
-	return false, nil
+	logger.GetInstance().Log("Deployment YAML okay")
+	return true, nil
 }
 
 //CreateNamespace within kubernetes
