@@ -190,6 +190,12 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	if err != nil {
 		return err
 	}
+
+	//Deployment create
+	if err := k8sinterface.CreateDeployment(build); err != nil {
+		return err
+	}
+
 	logger.GetInstance().Log(fmt.Sprintf("Created namespace %s", ns.GetName()))
 
 	return nil
