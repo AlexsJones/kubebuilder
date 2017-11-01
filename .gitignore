@@ -1,3 +1,6 @@
+vendor
+_vendor*
+Godeps*
 mount
 example_repo
 kubebuilder
