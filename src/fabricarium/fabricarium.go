@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/AlexsJones/kubebuilder/src/config"
 	"github.com/AlexsJones/kubebuilder/src/data"
@@ -124,43 +123,37 @@ func (f *Fabricarium) processBuild(dynamicBuildPath string, build *data.BuildDef
 
 	dockerClient := container.NewDocker()
 
-	containerID, err := dockerClient.CreateContainerName(build.Build.Docker.ContainerID, build.Build.Docker.Tag, build.Build.Docker.TagReplacementValue)
-	if err != nil {
-		return err
-	}
 	//Lets modify the build commands if it references our replacement value
-	buildCommands := strings.Replace(build.Build.Commands, build.Build.Docker.TagReplacementValue, build.Build.Docker.Tag, -1)
 
-	if err = sh.RunCommand(dynamicBuildPath, buildCommands); err != nil {
-		return err
-	}
-
-	logger.GetInstance().Log(fmt.Sprintf("Using docker container %s\n", containerID))
+	logger.GetInstance().Log(fmt.Sprintf("Running commands %s", build.Build.Commands))
+	err := sh.RunCommand(dynamicBuildPath, build.Build.Commands)
 	if err != nil {
 		return err
 	}
+
+	logger.GetInstance().Log(fmt.Sprintf("Using docker container %s\n", build.Build.Docker.ContainerID))
+
 	//Verify build
-	if ok, err := container.Exists(dockerClient, containerID); !ok {
+	if ok, err := container.Exists(dockerClient, build.Build.Docker.ContainerID); !ok {
 		return err
 	}
 
 	//VerifyAge
-	if ok, err := container.YoungerThan(dockerClient, containerID, 5); !ok {
+	if ok, err := container.YoungerThan(dockerClient, build.Build.Docker.ContainerID, 5); !ok {
 		return err
 	}
 
 	//tag command
-	remoteURL := strings.Replace(build.Build.Docker.Buildargs.URL, build.Build.Docker.TagReplacementValue, build.Build.Docker.Tag, -1)
-	logger.GetInstance().Log(fmt.Sprintf("Using remote URL %s", remoteURL))
+	logger.GetInstance().Log(fmt.Sprintf("Using remote URL %s", build.Build.Docker.Buildargs.URL))
 
-	tagCommand := fmt.Sprintf("gcloud docker -- tag %s %s", containerID, remoteURL)
+	tagCommand := fmt.Sprintf("gcloud docker -- tag %s %s", build.Build.Docker.ContainerID, build.Build.Docker.Buildargs.URL)
 	//Deploy build
 	if err = sh.RunCommand(dynamicBuildPath, tagCommand); err != nil {
 		return err
 	}
 	logger.GetInstance().Log(tagCommand)
 
-	pushCommand := fmt.Sprintf("gcloud docker -- push %s", remoteURL)
+	pushCommand := fmt.Sprintf("gcloud docker -- push %s", build.Build.Docker.Buildargs.URL)
 	if err = sh.RunCommand(dynamicBuildPath, pushCommand); err != nil {
 		return err
 	}

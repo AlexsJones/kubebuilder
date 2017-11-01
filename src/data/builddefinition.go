@@ -38,16 +38,13 @@ type VCS struct {
 
 //Docker ...
 type Docker struct {
-	Tag                 string          `yaml:"tag"`
-	TagReplacementValue string          `yaml:"tagReplacementValue"`
-	Buildargs           DockerBuildArgs `yaml:"buildArgs"`
-	ContainerID         string          `yaml:"containerID"`
+	Buildargs   DockerBuildArgs `yaml:"buildArgs"`
+	ContainerID string          `yaml:"containerID"`
 }
 
 //DockerBuildArgs ...
 type DockerBuildArgs struct {
-	Remote string `yaml:"remote"`
-	URL    string `yaml:"url"`
+	URL string `yaml:"url"`
 }
 
 //Build ...
@@ -58,8 +55,8 @@ type Build struct {
 
 //Kubernetes ...
 type Kubernetes struct {
-	Namespace string `yaml:"namespace" validate:"required"`
-	YAML      string `yaml:"yaml"`
+	Namespace  string `yaml:"namespace" validate:"required"`
+	Deployment string `yaml:"deployment"`
 }
 
 //BuildDefinition ...

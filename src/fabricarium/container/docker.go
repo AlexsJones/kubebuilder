@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/AlexsJones/kubebuilder/src/log"
@@ -27,17 +26,6 @@ func NewDocker() *Docker {
 		return nil
 	}
 	return &Docker{cli: cli, ctx: &ctx}
-}
-
-//CreateContainerName ...
-func (d *Docker) CreateContainerName(containerID string, containerTag string, containerTagReplacementValue string) (string, error) {
-
-	if containerID == "" || containerTag == "" || containerTagReplacementValue == "" {
-		return "", errors.New("Incomplete strings")
-	}
-	result := strings.Replace(containerID, containerTagReplacementValue, containerTag, -1)
-
-	return result, nil
 }
 
 //Exists checks docker images for being real

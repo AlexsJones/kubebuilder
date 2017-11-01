@@ -63,9 +63,9 @@ func (k *Kubernetes) ValidateDeployment(build *data.BuildDefinition) (bool, erro
 	logger.GetInstance().Log("Attempting serialisation of YAML")
 
 	d := scheme.Codecs.UniversalDeserializer()
-	_, _, err := d.Decode([]byte(build.Kubernetes.YAML), nil, nil)
+	_, _, err := d.Decode([]byte(build.Kubernetes.Deployment), nil, nil)
 	if err != nil {
-		logger.GetInstance().Log(fmt.Sprintf("could not decode yaml: %s\n%s", build.Kubernetes.YAML, err))
+		logger.GetInstance().Log(fmt.Sprintf("could not decode yaml: %s\n%s", build.Kubernetes.Deployment, err))
 		return false, err
 	}
 	logger.GetInstance().Log("Deployment YAML okay")

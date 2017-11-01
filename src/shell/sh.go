@@ -28,13 +28,13 @@ func RunCommand(path string, commands string) error {
 
 	err = cmd.Start()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
+		fmt.Fprintln(os.Stderr, "Error starting Cmd", err.Error())
 		return err
 	}
 
 	err = cmd.Wait()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err)
+		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err.Error())
 		return err
 	}
 	return nil

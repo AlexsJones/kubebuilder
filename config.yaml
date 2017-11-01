@@ -1,9 +1,9 @@
 kubebuilder:
   mount: ./mount
   drainqueue: false
-  bypassVCS: true
-  bypassBuild: true
-  bypassKubernetes: false
+  bypassVCS: false
+  bypassBuild: false
+  bypassKubernetes: true
 pubsub:
   connectionString: beamery-trials
   topic: cadium

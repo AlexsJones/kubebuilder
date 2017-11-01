@@ -5,17 +5,14 @@ vcs:
   path: git@github.com:SeedJobs/api-core.git
   checkoutArgs: ""
 build:
-  commands: gcloud docker -- build --no-cache=true -t api-core:TAGNAME .
+  commands: gcloud docker -- build --no-cache=true -t api-core:latest .
   docker:
-    tag: latest
-    tagReplacementValue: v1
-    containerID: api-core:TAGNAME
+    containerID: api-core:latest
     buildArgs:
-      remote:
-      url: us.gcr.io/beamery-trials/api-core:TAGNAME
+      url: us.gcr.io/beamery-trials/api-core:latest
 kubernetes:
   namespace: test
-  yaml: |-
+  deployment: |-
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -29,4 +26,4 @@ kubernetes:
             app: api-core
           containers:
           - name: api-core
-            image: us.gcr.io/beamery-trials/api-core:TAGNAME
+            image: us.gcr.io/beamery-trials/api-core:latest
