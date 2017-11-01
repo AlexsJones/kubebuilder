@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
+	"strings"
 
 	event "github.com/AlexsJones/cloud-transponder/events"
 	"github.com/AlexsJones/cloud-transponder/events/pubsub"
@@ -14,8 +16,17 @@ import (
 
 func main() {
 
+	confPath := flag.String("conf", "", "Set a custom configuration path")
+
+	flag.Parse()
+
+	var path string = "config.yaml"
+	if strings.Compare(*confPath, "") != 0 {
+		path = *confPath
+		logger.GetInstance().Log(fmt.Sprintf("Using custom log path %s", path))
+	}
 	//Load configuration
-	conf, err := config.LoadConfiguration("config.yaml")
+	conf, err := config.LoadConfiguration(path)
 	if err != nil {
 		log.Fatal(err)
 	}

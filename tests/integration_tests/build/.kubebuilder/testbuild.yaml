@@ -8,16 +8,25 @@ build:
   commands: gcloud docker -- build --no-cache=true -t api-core:TAGNAME .
   docker:
     tag: latest
-    tagReplacementValue: TAGNAME
+    tagReplacementValue: v1
     containerID: api-core:TAGNAME
     buildArgs:
       remote:
       url: us.gcr.io/beamery-trials/api-core:TAGNAME
 kubernetes:
-  namespace: alex
-  yaml: |- 
+  namespace: test
+  yaml: |-
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
-      name: THISISBROKEN
-      namespace: THISCANTBETRUE
+      name: api-core
+      namespace: test
+    spec:
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: api-core
+          containers:
+          - name: api-core
+            image: us.gcr.io/beamery-trials/api-core:TAGNAME
