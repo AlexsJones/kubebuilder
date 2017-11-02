@@ -91,6 +91,21 @@ func (k *Kubernetes) ValidateDeployment(build *data.BuildDefinition) (bool, erro
 	return true, nil
 }
 
+//ValidateIngress from deserialisation of YAML
+func (k *Kubernetes) ValidateIngress(build *data.BuildDefinition) (bool, error) {
+	//TODO: NEEDS some proper checks here not just deserialisation
+	logger.GetInstance().Log("Attempting deserialisation of YAML")
+
+	d := scheme.Codecs.UniversalDeserializer()
+	_, _, err := d.Decode([]byte(build.Kubernetes.Ingress), nil, nil)
+	if err != nil {
+		logger.GetInstance().Log(fmt.Sprintf("could not decode yaml: %s\n%s", build.Kubernetes.Ingress, err))
+		return false, err
+	}
+	logger.GetInstance().Log("Ingress YAML okay")
+	return true, nil
+}
+
 //CreateNamespace within kubernetes
 func (k *Kubernetes) CreateNamespace(namespace string) (*v1.Namespace, error) {
 	if ns, err := k.GetNamespace(namespace); err == nil {
@@ -129,7 +144,7 @@ func (k *Kubernetes) CreateDeployment(build *data.BuildDefinition) (*beta.Deploy
 	if err != nil {
 		logger.GetInstance().Log("Trying to update existing deployment....")
 
-		_, err := deploymentClient.Update(obj.(*beta.Deployment))
+		deployment, err = deploymentClient.Update(obj.(*beta.Deployment))
 		if err == nil {
 			logger.GetInstance().Log("Updated existing deployment")
 			return deployment, nil
@@ -157,7 +172,7 @@ func (k *Kubernetes) CreateService(build *data.BuildDefinition) (*v1.Service, er
 	if err != nil {
 		logger.GetInstance().Log("Trying to update existing service....")
 
-		_, err := serviceClient.Update(obj.(*v1.Service))
+		service, err = serviceClient.Update(obj.(*v1.Service))
 		if err == nil {
 			logger.GetInstance().Log("Updated existing service")
 			return service, nil
@@ -167,4 +182,32 @@ func (k *Kubernetes) CreateService(build *data.BuildDefinition) (*v1.Service, er
 	}
 
 	return service, nil
+}
+
+//CreateIngress ...
+func (k *Kubernetes) CreateIngress(build *data.BuildDefinition) (*beta.Ingress, error) {
+
+	deserializer := serializer.NewCodecFactory(clientsetscheme.Scheme).UniversalDeserializer()
+	obj, _, err := deserializer.Decode([]byte(build.Kubernetes.Ingress), nil, nil)
+
+	if err != nil {
+		logger.GetInstance().Log(fmt.Sprintf("could not decode yaml: %s\n%s", build.Kubernetes.Ingress, err))
+		return nil, err
+	}
+
+	ingressClient := k.clientset.ExtensionsV1beta1().Ingresses(build.Kubernetes.Ingress)
+
+	ingress, err := ingressClient.Create(obj.(*beta.Ingress))
+	if err != nil {
+		logger.GetInstance().Log("Trying to update existing ingress....")
+
+		ingress, err = ingressClient.Update(obj.(*beta.Ingress))
+		if err == nil {
+			logger.GetInstance().Log("Updated existing ingess")
+			return ingress, nil
+		}
+
+		return nil, err
+	}
+	return ingress, nil
 }

@@ -10,9 +10,11 @@ import (
 type IPlatform interface {
 	ValidateDeployment(build *data.BuildDefinition) (bool, error)
 	ValidateService(build *data.BuildDefinition) (bool, error)
+	ValidateIngress(build *data.BuildDefinition) (bool, error)
 	CreateNamespace(string) (*v1.Namespace, error)
 	CreateDeployment(build *data.BuildDefinition) (*beta.Deployment, error)
 	CreateService(build *data.BuildDefinition) (*v1.Service, error)
+	CreateIngress(build *data.BuildDefinition) (*beta.Ingress, error)
 }
 
 //ValidateDeployment from deserialisation of YAML
@@ -23,6 +25,11 @@ func ValidateDeployment(i IPlatform, build *data.BuildDefinition) (bool, error) 
 //ValidateService from deserialisation of YAML
 func ValidateService(i IPlatform, build *data.BuildDefinition) (bool, error) {
 	return i.ValidateService(build)
+}
+
+//ValidateIngress from deserialisation of YAML
+func ValidateIngress(i IPlatform, build *data.BuildDefinition) (bool, error) {
+	return i.ValidateIngress(build)
 }
 
 //CreateNamespace within the platform cluster
@@ -38,4 +45,9 @@ func CreateDeployment(i IPlatform, build *data.BuildDefinition) (*beta.Deploymen
 //CreateService within the platform cluster
 func CreateService(i IPlatform, build *data.BuildDefinition) (*v1.Service, error) {
 	return i.CreateService(build)
+}
+
+//CreateIngress within the platform cluster
+func CreateIngress(i IPlatform, build *data.BuildDefinition) (*beta.Ingress, error) {
+	return i.CreateIngress(build)
 }

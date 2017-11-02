@@ -204,5 +204,21 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	}
 	logger.GetInstance().Log(fmt.Sprintf("Created service %s", svc.GetName()))
 
+	//Ingress create
+
+	//ValidateIngress validation
+	ok, err = platform.ValidateIngress(k8sinterface, build)
+	if !ok {
+		return err
+	}
+
+	//Ingress create
+	ing, err := platform.CreateIngress(k8sinterface, build)
+	if err != nil {
+		return err
+	}
+
+	logger.GetInstance().Log(fmt.Sprintf("Created ingress %s", ing.GetName()))
+
 	return nil
 }

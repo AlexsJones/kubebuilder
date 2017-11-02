@@ -53,3 +53,98 @@ kubernetes:
               imagePullPolicy: Always
               ports:
                 - containerPort: 9089
+  ingress: |-
+    kind: Ingress
+    apiVersion: extensions/v1beta1
+    metadata:
+      name: ingress
+      namespace: test
+    spec:
+      # tls:
+      #   - hosts:
+      #     - api.trials.beamery.com
+      #     - mail.trials.beamery.com
+      #     - notify.trials.beamery.com
+      #     - portal.trials.beamery.com
+      #     - vmware.trials.beamery.com
+      #     - pages.trials.beamery.com
+      #     - app.trials.beamery.com
+      #     - widget.trials.beamery.com
+      #     - marketing.trials.beamery.com
+      #     - admin.trials.beamery.com
+      #     - trials.beamery.com
+      #     - www.trials.beamery.com
+      #     secretName: trials-tls
+      rules:
+      - host: api.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: api-core
+                servicePort: 9089
+      - host: mail.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: api-mail
+                servicePort: 2501
+      - host: notify.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: api-notifications
+                servicePort: 9082
+      - host: portal.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: api-portal
+                servicePort: 9088
+      - host: vmware.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: app-portal
+                servicePort: 9077
+      - host: pages.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: app-pages
+                servicePort: 9087
+      - host: app.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: app-beamery
+                servicePort: 9089
+      - host: widget.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: app-widget
+                servicePort: 3000
+      - host: marketing.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: app-site
+                servicePort: 9084
+      - host: admin.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: app-admin
+                servicePort: 8089
+      - host: trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: app-site-ng2
+                servicePort: 8081
+      - host: www.trials.beamery.com
+        http:
+          paths:
+            - backend:
+                serviceName: app-site-ng2
+                servicePort: 8081
