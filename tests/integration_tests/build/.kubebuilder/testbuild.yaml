@@ -19,11 +19,22 @@ kubernetes:
       name: api-core
       namespace: test
     spec:
-      replicas: 1
+      revisionHistoryLimit: 5
+      replicas: 2
+      minReadySeconds: 20
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 1
       template:
         metadata:
           labels:
             app: api-core
+        spec:
           containers:
-          - name: api-core
-            image: us.gcr.io/beamery-trials/api-core:latest
+            - name: api-core
+              image: us.gcr.io/beamery-trials/api-core:latest
+              imagePullPolicy: Always
+              ports:
+                - containerPort: 9089

@@ -95,7 +95,7 @@ func (f *Fabricarium) Process(build *data.BuildDefinition) {
 		logger.GetInstance().Info("Bypassing Kubernetes")
 	} else {
 		if err := f.processK8s(dynamicBuildPath, build); err != nil {
-			logger.GetInstance().Fatal(err.Error())
+			logger.GetInstance().Log(err.Error())
 			return
 		}
 	}
