@@ -9,6 +9,7 @@ import (
 //IPlatform interface for container platform
 type IPlatform interface {
 	ValidateDeployment(build *data.BuildDefinition) (bool, error)
+	ValidateService(build *data.BuildDefinition) (bool, error)
 	CreateNamespace(string) (*v1.Namespace, error)
 	CreateDeployment(build *data.BuildDefinition) (*beta.Deployment, error)
 	CreateService(build *data.BuildDefinition) error
@@ -17,6 +18,11 @@ type IPlatform interface {
 //ValidateDeployment from deserialisation of YAML
 func ValidateDeployment(i IPlatform, build *data.BuildDefinition) (bool, error) {
 	return i.ValidateDeployment(build)
+}
+
+//ValidateService from deserialisation of YAML
+func ValidateService(i IPlatform, build *data.BuildDefinition) (bool, error) {
+	return i.ValidateService(build)
 }
 
 //CreateNamespace within the platform cluster

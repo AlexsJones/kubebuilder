@@ -192,7 +192,16 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	}
 	logger.GetInstance().Log(fmt.Sprintf("Created deployment %s", deployment.GetName()))
 
+	//Service validation
+	ok, err = platform.ValidateService(k8sinterface, build)
+	if !ok {
+		return err
+	}
 	//Service create
+	err = platform.CreateService(k8sinterface, build)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

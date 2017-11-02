@@ -60,10 +60,26 @@ func NewKubernetes(masterURL string, inclusterConfig bool) (*Kubernetes, error) 
 	return &Kubernetes{clientset: clientset, config: config}, nil
 }
 
+//ValidateService from deserialisation of YAML
+func (k *Kubernetes) ValidateService(build *data.BuildDefinition) (bool, error) {
+
+	//TODO: NEEDS some proper checks here not just deserialisation
+	logger.GetInstance().Log("Attempting deserialisation of YAML")
+
+	d := scheme.Codecs.UniversalDeserializer()
+	_, _, err := d.Decode([]byte(build.Kubernetes.Service), nil, nil)
+	if err != nil {
+		logger.GetInstance().Log(fmt.Sprintf("could not decode yaml: %s\n%s", build.Kubernetes.Service, err))
+		return false, err
+	}
+	logger.GetInstance().Log("Service YAML okay")
+	return true, nil
+}
+
 //ValidateDeployment from deserialisation of YAML
 func (k *Kubernetes) ValidateDeployment(build *data.BuildDefinition) (bool, error) {
-
-	logger.GetInstance().Log("Attempting serialisation of YAML")
+	//TODO: NEEDS some proper checks here not just deserialisation
+	logger.GetInstance().Log("Attempting deserialisation of YAML")
 
 	d := scheme.Codecs.UniversalDeserializer()
 	_, _, err := d.Decode([]byte(build.Kubernetes.Deployment), nil, nil)
@@ -125,7 +141,30 @@ func (k *Kubernetes) CreateDeployment(build *data.BuildDefinition) (*beta.Deploy
 }
 
 //CreateService ...
-func (k *Kubernetes) CreateService(build *data.BuildDefinition) error {
+func (k *Kubernetes) CreateService(build *data.BuildDefinition) (*v1.Service, error) {
 
-	return nil
+	deserializer := serializer.NewCodecFactory(clientsetscheme.Scheme).UniversalDeserializer()
+	obj, _, err := deserializer.Decode([]byte(build.Kubernetes.Service), nil, nil)
+
+	if err != nil {
+		logger.GetInstance().Log(fmt.Sprintf("could not decode yaml: %s\n%s", build.Kubernetes.Service, err))
+		return nil, err
+	}
+
+	serviceClient := k.clientset.CoreV1().Services(build.Kubernetes.Namespace)
+
+	service, err := serviceClient.Create(obj.(*v1.Service))
+	if err != nil {
+		logger.GetInstance().Log("Trying to update existing service....")
+
+		_, err := serviceClient.Update(obj.(*v1.Service))
+		if err == nil {
+			logger.GetInstance().Log("Updated existing service")
+			return service, nil
+		}
+
+		return nil, err
+	}
+
+	return service, nil
 }
