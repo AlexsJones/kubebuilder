@@ -12,7 +12,7 @@ type IPlatform interface {
 	ValidateService(build *data.BuildDefinition) (bool, error)
 	CreateNamespace(string) (*v1.Namespace, error)
 	CreateDeployment(build *data.BuildDefinition) (*beta.Deployment, error)
-	CreateService(build *data.BuildDefinition) error
+	CreateService(build *data.BuildDefinition) (*v1.Service, error)
 }
 
 //ValidateDeployment from deserialisation of YAML
@@ -36,6 +36,6 @@ func CreateDeployment(i IPlatform, build *data.BuildDefinition) (*beta.Deploymen
 }
 
 //CreateService within the platform cluster
-func CreateService(i IPlatform, build *data.BuildDefinition) error {
+func CreateService(i IPlatform, build *data.BuildDefinition) (*v1.Service, error) {
 	return i.CreateService(build)
 }

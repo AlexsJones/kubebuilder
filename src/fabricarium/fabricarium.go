@@ -198,10 +198,11 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 		return err
 	}
 	//Service create
-	err = platform.CreateService(k8sinterface, build)
+	svc, err := platform.CreateService(k8sinterface, build)
 	if err != nil {
 		return err
 	}
+	logger.GetInstance().Log(fmt.Sprintf("Created service %s", svc.GetName()))
 
 	return nil
 }
