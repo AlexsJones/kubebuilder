@@ -12,6 +12,21 @@ build:
       url: us.gcr.io/beamery-trials/api-core:latest
 kubernetes:
   namespace: test
+  service: |-
+    kind: Service
+    apiVersion: v1
+    metadata:
+      name: api-core
+      namespace: test
+    spec:
+      type: NodePort
+      selector:
+        app: api-core
+      ports:
+        - protocol: TCP
+          port: 9089
+          targetPort: 9089
+          name: api-core
   deployment: |-
     apiVersion: extensions/v1beta1
     kind: Deployment

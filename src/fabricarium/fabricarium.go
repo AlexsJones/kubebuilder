@@ -174,22 +174,25 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 		return err
 	}
 	//Deployment validation
-	ok, err := k8sinterface.ValidateDeployment(build)
+	ok, err := platform.ValidateDeployment(k8sinterface, build)
 	if !ok {
 		return err
 	}
 	//Check if NS exists else...
-	ns, err := k8sinterface.CreateNamespace(build.Kubernetes.Namespace)
+	ns, err := platform.CreateNamespace(k8sinterface, build.Kubernetes.Namespace)
 	if err != nil {
 		return err
 	}
+	logger.GetInstance().Log(fmt.Sprintf("Created namespace %s", ns.GetName()))
 
 	//Deployment create
-	if err := k8sinterface.CreateDeployment(build); err != nil {
+	deployment, err := platform.CreateDeployment(k8sinterface, build)
+	if err != nil {
 		return err
 	}
+	logger.GetInstance().Log(fmt.Sprintf("Created deployment %s", deployment.GetName()))
 
-	logger.GetInstance().Log(fmt.Sprintf("Created namespace %s", ns.GetName()))
+	//Service create
 
 	return nil
 }

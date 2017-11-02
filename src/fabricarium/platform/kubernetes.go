@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
 
 	"github.com/AlexsJones/kubebuilder/src/data"
 	"github.com/AlexsJones/kubebuilder/src/log"
@@ -98,33 +97,35 @@ func (k *Kubernetes) GetNamespace(namespace string) (*v1.Namespace, error) {
 }
 
 //CreateDeployment ...
-func (k *Kubernetes) CreateDeployment(build *data.BuildDefinition) error {
+func (k *Kubernetes) CreateDeployment(build *data.BuildDefinition) (*beta.Deployment, error) {
 
 	deserializer := serializer.NewCodecFactory(clientsetscheme.Scheme).UniversalDeserializer()
 	obj, _, err := deserializer.Decode([]byte(build.Kubernetes.Deployment), nil, nil)
 
 	if err != nil {
 		logger.GetInstance().Log(fmt.Sprintf("could not decode yaml: %s\n%s", build.Kubernetes.Deployment, err))
-		return err
+		return nil, err
 	}
-	logger.GetInstance().Info(reflect.TypeOf(obj).String())
-
-	logger.GetInstance().Info("Successfully serialised deployment!")
 
 	deploymentClient := k.clientset.ExtensionsV1beta1().Deployments(build.Kubernetes.Namespace)
 
-	_, err = deploymentClient.Create(obj.(*beta.Deployment))
+	deployment, err := deploymentClient.Create(obj.(*beta.Deployment))
 	if err != nil {
 		logger.GetInstance().Log("Trying to update existing deployment....")
 
 		_, err := deploymentClient.Update(obj.(*beta.Deployment))
 		if err == nil {
-			logger.GetInstance().Info("Updated existing deployment")
-			return nil
+			logger.GetInstance().Log("Updated existing deployment")
+			return deployment, nil
 		}
 
-		return err
+		return nil, err
 	}
-	logger.GetInstance().Info("Deployed!")
+	return deployment, nil
+}
+
+//CreateService ...
+func (k *Kubernetes) CreateService(build *data.BuildDefinition) error {
+
 	return nil
 }

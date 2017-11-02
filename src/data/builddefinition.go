@@ -57,6 +57,7 @@ type Build struct {
 type Kubernetes struct {
 	Namespace  string `yaml:"namespace" validate:"required"`
 	Deployment string `yaml:"deployment"`
+	Service    string `yaml:"service"`
 }
 
 //BuildDefinition ...
