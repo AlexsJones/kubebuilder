@@ -15,3 +15,8 @@ The purpose here is to let multiple developers have their own namespaces in a k8
 - protobuf-compiler
 - sshkey for VCS (git currently)
 - Requires a json service account file for GCP 
+
+
+### Usage
+
+![Diagram](https://i.imgur.com/Ddn3oyU.png)
