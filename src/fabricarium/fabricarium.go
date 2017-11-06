@@ -226,7 +226,7 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 
 	//Poll ingress address
 
-	ip, err := platform.GetIngressLoadBalancerIPAddress(k8sinterface, ing, time.Second*10)
+	ip, err := platform.GetIngressLoadBalancerIPAddress(k8sinterface, ing, time.Second*30)
 	if err != nil {
 		logger.GetInstance().Warn(err.Error())
 	} else {

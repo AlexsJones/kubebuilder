@@ -224,9 +224,12 @@ func (k *Kubernetes) GetIngressLoadBalancerIPAddress(ingress *beta.Ingress, t ti
 		if elapsed > t {
 			return "", errors.New("Too much time has elapsed waiting for load balancer")
 		}
-
-		if ingress.Status.LoadBalancer.Ingress[0].IP != "" || len(ingress.Status.LoadBalancer.Ingress[0].IP) > 0 {
-			return ingress.Status.LoadBalancer.Ingress[0].IP, nil
+		if len(ingress.Status.LoadBalancer.Ingress) > 0 {
+			if ingress.Status.LoadBalancer.Ingress[0].IP != "" || len(ingress.Status.LoadBalancer.Ingress[0].IP) > 0 {
+				return ingress.Status.LoadBalancer.Ingress[0].IP, nil
+			}
 		}
+		time.Sleep(time.Second)
+		logger.GetInstance().Log("Waiting...")
 	}
 }
