@@ -1,9 +1,11 @@
 package platform
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/AlexsJones/kubebuilder/src/data"
 	"github.com/AlexsJones/kubebuilder/src/log"
@@ -195,7 +197,7 @@ func (k *Kubernetes) CreateIngress(build *data.BuildDefinition) (*beta.Ingress, 
 		return nil, err
 	}
 
-	ingressClient := k.clientset.ExtensionsV1beta1().Ingresses(build.Kubernetes.Ingress)
+	ingressClient := k.clientset.ExtensionsV1beta1().Ingresses(build.Kubernetes.Namespace)
 
 	ingress, err := ingressClient.Create(obj.(*beta.Ingress))
 	if err != nil {
@@ -210,4 +212,21 @@ func (k *Kubernetes) CreateIngress(build *data.BuildDefinition) (*beta.Ingress, 
 		return nil, err
 	}
 	return ingress, nil
+}
+
+//GetIngressLoadBalancerIPAddress ...
+func (k *Kubernetes) GetIngressLoadBalancerIPAddress(ingress *beta.Ingress, t time.Duration) (string, error) {
+
+	start := time.Now()
+	for {
+
+		elapsed := time.Since(start)
+		if elapsed > t {
+			return "", errors.New("Too much time has elapsed waiting for load balancer")
+		}
+
+		if ingress.Status.LoadBalancer.Ingress[0].IP != "" || len(ingress.Status.LoadBalancer.Ingress[0].IP) > 0 {
+			return ingress.Status.LoadBalancer.Ingress[0].IP, nil
+		}
+	}
 }

@@ -1,6 +1,8 @@
 package platform
 
 import (
+	"time"
+
 	"github.com/AlexsJones/kubebuilder/src/data"
 	"k8s.io/api/core/v1"
 	beta "k8s.io/api/extensions/v1beta1"
@@ -15,6 +17,7 @@ type IPlatform interface {
 	CreateDeployment(build *data.BuildDefinition) (*beta.Deployment, error)
 	CreateService(build *data.BuildDefinition) (*v1.Service, error)
 	CreateIngress(build *data.BuildDefinition) (*beta.Ingress, error)
+	GetIngressLoadBalancerIPAddress(ingress *beta.Ingress, t time.Duration) (string, error)
 }
 
 //ValidateDeployment from deserialisation of YAML
@@ -50,4 +53,9 @@ func CreateService(i IPlatform, build *data.BuildDefinition) (*v1.Service, error
 //CreateIngress within the platform cluster
 func CreateIngress(i IPlatform, build *data.BuildDefinition) (*beta.Ingress, error) {
 	return i.CreateIngress(build)
+}
+
+//GetIngressLoadBalancerIPAddress with a timeout for the action
+func GetIngressLoadBalancerIPAddress(i IPlatform, ingress *beta.Ingress, t time.Duration) (string, error) {
+	return i.GetIngressLoadBalancerIPAddress(ingress, t)
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"time"
 
 	"github.com/AlexsJones/kubebuilder/src/config"
 	"github.com/AlexsJones/kubebuilder/src/data"
@@ -173,24 +174,28 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	if err != nil {
 		return err
 	}
+
+	//Check if NS exists else...
+	ns, err := platform.CreateNamespace(k8sinterface, build.Kubernetes.Namespace)
+	if err != nil {
+		logger.GetInstance().Warn(err.Error())
+	} else {
+		logger.GetInstance().Log(fmt.Sprintf("Created namespace %s", ns.GetName()))
+	}
+
 	//Deployment validation
 	ok, err := platform.ValidateDeployment(k8sinterface, build)
 	if !ok {
 		return err
 	}
-	//Check if NS exists else...
-	ns, err := platform.CreateNamespace(k8sinterface, build.Kubernetes.Namespace)
-	if err != nil {
-		return err
-	}
-	logger.GetInstance().Log(fmt.Sprintf("Created namespace %s", ns.GetName()))
 
 	//Deployment create
 	deployment, err := platform.CreateDeployment(k8sinterface, build)
 	if err != nil {
-		return err
+		logger.GetInstance().Warn(err.Error())
+	} else {
+		logger.GetInstance().Log(fmt.Sprintf("Created deployment %s", deployment.GetName()))
 	}
-	logger.GetInstance().Log(fmt.Sprintf("Created deployment %s", deployment.GetName()))
 
 	//Service validation
 	ok, err = platform.ValidateService(k8sinterface, build)
@@ -200,11 +205,10 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	//Service create
 	svc, err := platform.CreateService(k8sinterface, build)
 	if err != nil {
-		return err
+		logger.GetInstance().Warn(err.Error())
+	} else {
+		logger.GetInstance().Log(fmt.Sprintf("Created service %s", svc.GetName()))
 	}
-	logger.GetInstance().Log(fmt.Sprintf("Created service %s", svc.GetName()))
-
-	//Ingress create
 
 	//ValidateIngress validation
 	ok, err = platform.ValidateIngress(k8sinterface, build)
@@ -215,10 +219,19 @@ func (f *Fabricarium) processK8s(dynamicBuildPath string, build *data.BuildDefin
 	//Ingress create
 	ing, err := platform.CreateIngress(k8sinterface, build)
 	if err != nil {
-		return err
+		logger.GetInstance().Warn(err.Error())
+	} else {
+		logger.GetInstance().Log(fmt.Sprintf("Created ingress %s", ing.GetName()))
 	}
 
-	logger.GetInstance().Log(fmt.Sprintf("Created ingress %s", ing.GetName()))
+	//Poll ingress address
+
+	ip, err := platform.GetIngressLoadBalancerIPAddress(k8sinterface, ing, time.Second*10)
+	if err != nil {
+		logger.GetInstance().Warn(err.Error())
+	} else {
+		logger.GetInstance().Log(fmt.Sprintf("Ingress address is %s", ip))
+	}
 
 	return nil
 }

@@ -30,6 +30,12 @@ func (l *Logger) Log(args ...string) {
 	log.Printf(fmt.Sprintf("%s:%s", l.prefix(), args))
 }
 
+//Warn ...
+func (l *Logger) Warn(args ...string) {
+	red := color.New(color.FgRed).SprintFunc()
+	log.Printf(fmt.Sprintf("%s:%s", l.prefix(), red(args)))
+}
+
 //Fatal ...
 func (l *Logger) Fatal(args ...string) {
 	red := color.New(color.FgRed).SprintFunc()
