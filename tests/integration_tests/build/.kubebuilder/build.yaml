@@ -1,0 +1,64 @@
+vcs:
+  type: git
+  name: hello-go
+  branch: master
+  path: git@github.com:AlexsJones/kubernetes-hello-go
+  checkoutArgs: ""
+build:
+  commands: gcloud docker -- build --no-cache=true -t hello-go:latest .
+  docker:
+    containerID: hello-go:latest
+    buildArgs:
+      url: us.gcr.io/beamery-trials/hello-go:latest
+kubernetes:
+  namespace: alex
+  service: |-
+    kind: Service
+    apiVersion: v1
+    metadata:
+      name: hello-go
+      namespace: alex
+    spec:
+      type: NodePort
+      selector:
+        app: hello-go
+      ports:
+        - protocol: TCP
+          port: 9090
+          name: openport
+  deployment: |-
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    metadata:
+      name: hello-go
+      namespace: alex
+    spec:
+      revisionHistoryLimit: 5
+      replicas: 2
+      minReadySeconds: 20
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 1
+      template:
+        metadata:
+          labels:
+            app: hello-go
+        spec:
+          containers:
+            - name: hello-go
+              image: us.gcr.io/beamery-trials/hello-go:latest
+              imagePullPolicy: Always
+              ports:
+                - containerPort: 9090
+  ingress: |-
+    kind: Ingress
+    apiVersion: extensions/v1beta1
+    metadata:
+      name: ingress
+      namespace: alex
+    spec:
+     backend:
+      serviceName: hello-go
+      servicePort: 9090
