@@ -1,1 +1,3 @@
 version: kuberbuilder:v1
+namespace: kubebuilder
+registry: us.gcr.io/beamery-trials

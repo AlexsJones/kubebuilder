@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kubebuilder
+  namespace: {{.namespace}}
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: master
+    spec:
+      containers:
+        - name: master
+          image: {{.registry}}/{{.version}}
+          imagePullPolicy: Always
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /GOOGLE_APPLICATION_CREDENTIALS.json
+          volumeMounts:
+            - name: authentication
+              mountPath: /GOOGLE_APPLICATION_CREDENTIALS.json
+      volumes:
+        - name: dockersocket
+          hostPath:
+            path: /var/run/docker.sock
+
+        - name: system
+          hostPath:
+            path: /sys/fs/cgroup
+
+        - name: authentication
+          secret:
+            secretName: auth

@@ -2,6 +2,7 @@
 
 set +xe
 ENVIRONMENT="build"
+REGISTRY="us.gcr.io/beamery-trials"
 function deploy {
   if hash vortex 2>/dev/null; then
        echo "vortex installed..."
@@ -32,20 +33,24 @@ function deploy {
    fi
 
    # Do generation
-   rm -rf deployment 2>/dev/null
-   mkdir -p deployment
+   rm -rf k8s/deployment 2>/dev/null
+   mkdir -p k8s/deployment
 
-   for d in ./templates/*; do
+   for d in ./k8s/template/**/*; do
     filename=$(dirname $d)
     foldername=`echo basename $filename`
-    folderaltered=$(echo $foldername | sed 's/templates/deployment/g')
+    folderaltered=$(echo $foldername | sed 's/template/deployment/g')
     mkdir -p deployment/$folderaltered
 
-  newpath=$(echo $d | sed 's/templates/deployment/g')
+   newpath=$(echo $d | sed 's/template/deployment/g')
    echo "Creating $newpath"
    vortex --template $d --output $newpath -varpath ./k8s/environments/$ENVIRONMENT.yaml
+   cat $newpath
    done
 
+   #Do deployment
+
+   kubectl apply -f ./k8s/deployment/kubebuilder_deployment --namespace=kubebuilder
 }
 
 if [ -z "$1" ]

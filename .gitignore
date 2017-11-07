@@ -5,4 +5,5 @@ Godeps*
 mount
 example_repo
 kubebuilder
+k8s/deployment
 deployment
