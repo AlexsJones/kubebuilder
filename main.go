@@ -20,10 +20,12 @@ func main() {
 
 	flag.Parse()
 
-	var path string = "config.yaml"
+	path := "test-config.yaml"
 	if strings.Compare(*confPath, "") != 0 {
 		path = *confPath
-		logger.GetInstance().Log(fmt.Sprintf("Using custom log path %s", path))
+		logger.GetInstance().Log(fmt.Sprintf("Using custom config path %s", path))
+	} else {
+		logger.GetInstance().Log("Using test-config.yaml")
 	}
 	//Load configuration
 	conf, err := config.LoadConfiguration(path)

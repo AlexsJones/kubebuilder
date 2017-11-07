@@ -25,11 +25,11 @@ function deploy {
    kubectl get secret/auth --namespace=kubebuilder 2>/dev/null
    if [ $? -ne 0 ]
    then
-     kubectl create secret generic auth --from-file=k8s/auth.json --namespace=kubebuilder
+     kubectl create secret generic auth --from-file=k8s/GOOGLE_APPLICATION_CREDENTIALS.json --namespace=kubebuilder
    else
      kubectl delete secret/auth --namespace=kubebuilder
      echo "Writing over exiting secret..."
-     kubectl create secret generic auth --from-file=k8s/auth.json --namespace=kubebuilder
+     kubectl create secret generic auth --from-file=k8s/GOOGLE_APPLICATION_CREDENTIALS.json --namespace=kubebuilder
    fi
 
    # Do generation
@@ -60,7 +60,7 @@ fi
 
 
 while true; do
-    read -p "Requires GOOGLE_APPLICATION_CREDENTIALS.json renamed to auth.json and placed in the k8s folder. [y/n]" yn
+    read -p "Requires GOOGLE_APPLICATION_CREDENTIALS.json placed in the k8s folder. [y/n]" yn
     case $yn in
         [Yy]* ) deploy ; break;;
         [Nn]* ) exit;;

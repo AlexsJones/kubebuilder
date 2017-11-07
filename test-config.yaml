@@ -11,4 +11,4 @@ pubsub:
 kubernetes:
   masterurl: https://35.198.186.50
   incluster: false #With this set to false out of cluster configuration will be used, don't edit this unless you know what you're doing
-#  provisionnamespace: |- 
+#  provisionnamespace: |-

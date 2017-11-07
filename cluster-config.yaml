@@ -1,0 +1,13 @@
+kubebuilder:
+  mount: ./mount
+  drainqueue: false
+  bypassVCS: true
+  bypassBuild: true
+  bypassKubernetes: false
+pubsub:
+  connectionString: beamery-trials
+  topic: cadium
+  subscriptionString: cadium-sub
+kubernetes:
+  masterurl: https://35.198.186.50
+  incluster: true

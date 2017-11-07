@@ -2,6 +2,7 @@ if [ -z "$1" ]
   then
     echo "No argument supplied"
 fi
+
 version="v1"
 google_project=$1
 docker build --no-cache=true -t kubebuilder:$version .

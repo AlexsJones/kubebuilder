@@ -21,10 +21,10 @@ spec:
           imagePullPolicy: Always
           env:
             - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /GOOGLE_APPLICATION_CREDENTIALS.json
+              value: /secrets/GOOGLE_APPLICATION_CREDENTIALS.json
           volumeMounts:
             - name: authentication
-              mountPath: /GOOGLE_APPLICATION_CREDENTIALS.json
+              mountPath: /secrets
       volumes:
         - name: dockersocket
           hostPath:
