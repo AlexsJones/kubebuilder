@@ -13,10 +13,10 @@ spec:
   template:
     metadata:
       labels:
-        app: master
+        app: kubebuilder
     spec:
       containers:
-        - name: master
+        - name: kubebuilder
           image: {{.registry}}/{{.version}}
           imagePullPolicy: Always
           env:
