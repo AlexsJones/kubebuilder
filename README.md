@@ -1,6 +1,6 @@
 # kubebuilder
 
-![Imgur](https://i.imgur.com/xxDRsik.jpg)
+![Imgur](https://i.imgur.com/xxDRsik.jpg | width=250)
 
 
 A kubernetes deployment that allows developers to push their repositories via pubsub and have it deployed.
@@ -20,4 +20,4 @@ The purpose here is to let multiple developers have their own namespaces in a k8
 
 ### Usage
 
-![Diagram](https://i.imgur.com/Ddn3oyU.png)
+![Diagram](https://i.imgur.com/Ukf7vF2.jpg)
