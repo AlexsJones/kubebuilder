@@ -1,6 +1,5 @@
 # kubebuilder
-
-![Imgur](https://i.imgur.com/xxDRsik.jpg | width=250)
+<img src=https://i.imgur.com/xxDRsik.jpg width="250" />
 
 
 A kubernetes deployment that allows developers to push their repositories via pubsub and have it deployed.
