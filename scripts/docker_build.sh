@@ -1,6 +1,7 @@
 if [ -z "$1" ]
   then
-    echo "No argument supplied"
+    echo "Requires google project name"
+    exit 
 fi
 
 version="v1"

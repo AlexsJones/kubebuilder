@@ -1,5 +1,5 @@
 kubebuilder:
-  mount: ./mount
+  mount: /mount #Note this is root level, assumes kubernetes has a volume mounted for build files
   drainqueue: false
   bypassVCS: true
   bypassBuild: true

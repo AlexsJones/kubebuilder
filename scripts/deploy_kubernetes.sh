@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set +xe
 ENVIRONMENT="build"
 REGISTRY="us.gcr.io/beamery-trials"
@@ -49,13 +48,14 @@ function deploy {
    done
 
    #Do deployment
-
+   kubectl delete -f ./k8s/deployment/kubebuilder_deployment --namespace=kubebuilder 2>/dev/null
    kubectl apply -f ./k8s/deployment/kubebuilder_deployment --namespace=kubebuilder
 }
 
 if [ -z "$1" ]
   then
     echo "No argument supplied"
+    exit
 fi
 
 

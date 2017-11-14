@@ -17,4 +17,4 @@ ENV PATH ${PATH}:/google-cloud-sdk/bin:${GOPATH}/bin
 
 RUN go-wrapper download
 RUN go-wrapper install
-ENTRYPOINT ["kubebuilder","--conf cluster-config.yaml"]
+ENTRYPOINT ["kubebuilder","--conf", "cluster-config.yaml"]

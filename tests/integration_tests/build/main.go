@@ -17,7 +17,7 @@ import (
 func main() {
 
 	//Load configuration
-	conf, err := config.LoadConfiguration("config.yaml")
+	conf, err := config.LoadConfiguration("test-config.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,7 +40,7 @@ func main() {
 	st.Type = data.Message_BUILD
 
 	//Load yaml
-	raw, err := ioutil.ReadFile("./tests/integration_tests/build/.kubebuilder/testbuild.yaml")
+	raw, err := ioutil.ReadFile("./tests/integration_tests/build/.kubebuilder/build.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}

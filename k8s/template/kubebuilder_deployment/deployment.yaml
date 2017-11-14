@@ -4,12 +4,7 @@ metadata:
   name: kubebuilder
   namespace: {{.namespace}}
 spec:
-  replicas: 3
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+  replicas: 1
   template:
     metadata:
       labels:
@@ -25,6 +20,8 @@ spec:
           volumeMounts:
             - name: authentication
               mountPath: /secrets
+            - name: kubebuildermount
+              mountPath: /mount
       volumes:
         - name: dockersocket
           hostPath:
@@ -34,6 +31,9 @@ spec:
           hostPath:
             path: /sys/fs/cgroup
 
+        - name: kubebuildermount
+          persistentVolumeClaim:
+            claimName: kubebuilder-claim
         - name: authentication
           secret:
             secretName: auth
