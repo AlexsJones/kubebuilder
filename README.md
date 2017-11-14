@@ -1,6 +1,7 @@
 # kubebuilder
 <img src=https://i.imgur.com/xxDRsik.jpg width="250" />
 
+[![GitHub license](https://img.shields.io/github/license/AlexsJones/kubebuilder.svg)](https://github.com/AlexsJones/kubebuilder/blob/master/LICENSE)
 
 A kubernetes deployment that allows developers to push their repositories via pubsub and have it deployed.
 The purpose here is to let multiple developers have their own namespaces in a k8s cluster to work on, shared by a common ingress.
