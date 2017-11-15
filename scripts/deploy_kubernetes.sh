@@ -31,6 +31,11 @@ function deploy {
      kubectl create secret generic auth --from-file=k8s/GOOGLE_APPLICATION_CREDENTIALS.json --namespace=kubebuilder
    fi
 
+   kubectl get secret/key --namespace=kubebuilder 2>/dev/null
+   if [ $? -ne 0 ]
+   then
+     kubectl create secret generic key --from-file=/home/$(whoami)/.ssh/id_rsa --namespace=kubebuilder
+   fi
    # Do generation
    rm -rf k8s/deployment 2>/dev/null
    mkdir -p k8s/deployment
@@ -51,13 +56,6 @@ function deploy {
    kubectl delete -f ./k8s/deployment/kubebuilder_deployment --namespace=kubebuilder 2>/dev/null
    kubectl apply -f ./k8s/deployment/kubebuilder_deployment --namespace=kubebuilder
 }
-
-if [ -z "$1" ]
-  then
-    echo "No argument supplied"
-    exit
-fi
-
 
 while true; do
     read -p "Requires GOOGLE_APPLICATION_CREDENTIALS.json placed in the k8s folder. [y/n]" yn

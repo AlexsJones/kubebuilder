@@ -10,6 +10,10 @@ spec:
       labels:
         app: kubebuilder
     spec:
+      # initContainers:
+      # - name: init-ssh
+      #   image: busybox
+      #   command: ['sh', '-c', 'ls']
       containers:
         - name: kubebuilder
           image: {{.registry}}/{{.version}}
@@ -22,6 +26,8 @@ spec:
               mountPath: /secrets
             - name: kubebuildermount
               mountPath: /mount
+            - name: sshkey
+              mountPath: /root/.ssh
       volumes:
         - name: dockersocket
           hostPath:
@@ -34,6 +40,10 @@ spec:
         - name: kubebuildermount
           persistentVolumeClaim:
             claimName: kubebuilder-claim
+
         - name: authentication
           secret:
             secretName: auth
+        - name: sshkey
+          secret:
+            secretName: key

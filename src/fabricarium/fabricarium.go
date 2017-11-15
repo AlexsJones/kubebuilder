@@ -81,6 +81,7 @@ func (f *Fabricarium) Process(build *data.BuildDefinition) {
 	} else {
 		if err := f.processVCS(dynamicBuildPath, build); err != nil {
 			logger.GetInstance().Log(err.Error())
+			return
 		}
 	}
 	//Build
@@ -89,6 +90,7 @@ func (f *Fabricarium) Process(build *data.BuildDefinition) {
 	} else {
 		if err := f.processBuild(dynamicBuildPath, build); err != nil {
 			logger.GetInstance().Log(err.Error())
+			return
 		}
 	}
 	//K8s

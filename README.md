@@ -1,19 +1,18 @@
 # kubebuilder
 <img src=https://i.imgur.com/xxDRsik.jpg width="250" />
 
+I initially built kubebuilder for the developers at [BeameryHQ](https://github.com/BeameryHQ)
+It is a deployment for kubernetes that lets developers have minimal interaction but have their own subdomains
+and namespaces for creating applications.
 
-A kubernetes deployment that allows developers to push their repositories via pubsub and have it deployed.
-The purpose here is to let multiple developers have their own namespaces in a k8s cluster to work on, shared by a common ingress.
-
----
-
-## Development
+It requires a few pieces to get it all working, but is designed to be simple for the end user.
 
 ### Requirements
 
 - protobuf-compiler
 - sshkey for VCS (git currently)
-- Requires a json service account file for GCP 
+- Requires a json service account file for GCP named auth
+- Requires an ssh key that works as a secret named key
 - kepler for CLI interaction `go get https://github.com/AlexsJones/kepler`
 
 

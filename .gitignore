@@ -7,3 +7,5 @@ example_repo
 kubebuilder
 k8s/deployment
 deployment
+run.sh
+Dockerfile
