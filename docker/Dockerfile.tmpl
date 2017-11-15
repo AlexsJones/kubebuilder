@@ -1,11 +1,15 @@
-FROM golang:latest
+FROM ubuntu:16.04
 LABEL MAINTAINER Alex Jones <tibbar@freedommail.ch>
-ENV GOPATH=/go
-WORKDIR /go/src/github.com/AlexsJones/kubebuilder
-COPY . .
 
-RUN set -x && \
-  cd /tmp && \
+RUN apt-get update
+RUN apt-get install -y wget python curl docker
+
+# golang
+RUN cd /tmp && curl -O https://storage.googleapis.com/golang/go1.8.linux-amd64.tar.gz && \
+  tar -xvf go1.8.linux-amd64.tar.gz && mv go /usr/local
+
+# googlecloud
+RUN cd /tmp && \
   wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-172.0.1-linux-x86_64.tar.gz && \
   tar -xvf google-cloud-sdk-172.0.1-linux-x86_64.tar.gz && \
   mv google-cloud-sdk / && \
@@ -13,10 +17,18 @@ RUN set -x && \
   rm -rfv /tmp/* && \
   /google-cloud-sdk/bin/gcloud components update
 
+ENV GOPATH=/go
+ENV PATH=${PATH}:/usr/local/go/bin
 ENV PATH ${PATH}:/google-cloud-sdk/bin:${GOPATH}/bin
 
-RUN go-wrapper download
-RUN go-wrapper install
+WORKDIR /go/src/github.com/AlexsJones/kubebuilder
+COPY . .
 
-RUN chmod +x ./run.sh
-CMD ./run.sh
+RUN wget https://raw.githubusercontent.com/docker-library/golang/master/go-wrapper
+
+RUN chmod +x go-wrapper
+
+RUN ./go-wrapper download
+RUN ./go-wrapper install
+
+ENTRYPOINT ["kubebuilder","--conf","cluster-config.yaml"]
