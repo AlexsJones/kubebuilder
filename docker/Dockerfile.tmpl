@@ -31,4 +31,4 @@ RUN chmod +x go-wrapper
 RUN ./go-wrapper download
 RUN ./go-wrapper install
 
-ENTRYPOINT ["kubebuilder","--conf","cluster-config.yaml"]
+CMD ./run.sh

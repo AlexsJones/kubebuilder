@@ -2,6 +2,8 @@
 echo "Init ssh-agent"
 chmod 0600 /root/.ssh/id_rsa
 echo "Altered ssh security permissions"
+eval "$(ssh-agent -s)"
+echo "Init ssh-agent"
 ssh-add
 echo "Added ssh"
 touch /root/.ssh/known_hosts
