@@ -2,7 +2,7 @@ FROM ubuntu:16.04
 LABEL MAINTAINER Alex Jones <tibbar@freedommail.ch>
 
 RUN apt-get update
-RUN apt-get install -y wget python curl docker
+RUN apt-get install -y wget python curl openssh-server
 
 # golang
 RUN cd /tmp && curl -O https://storage.googleapis.com/golang/go1.8.linux-amd64.tar.gz && \
@@ -31,4 +31,6 @@ RUN chmod +x go-wrapper
 RUN ./go-wrapper download
 RUN ./go-wrapper install
 
+RUN curl -fsSL get.docker.com -o get-docker.sh
+RUN sh get-docker.sh
 CMD ./run.sh

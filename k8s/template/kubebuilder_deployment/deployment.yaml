@@ -28,6 +28,8 @@ spec:
               mountPath: /mount
             - name: sshkey
               mountPath: /root/.ssh
+            - name: dockersocket
+              mountPath: /var/run/docker.sock
       volumes:
         - name: dockersocket
           hostPath:

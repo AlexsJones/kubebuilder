@@ -5,7 +5,7 @@ vcs:
   path: git@github.com:AlexsJones/kubernetes-hello-go
   checkoutArgs: ""
 build:
-  commands: gcloud docker -- build --no-cache=true -t hello-go:latest .
+  commands: docker build --no-cache=true -t hello-go:latest .
   docker:
     containerID: hello-go:latest
     buildArgs:
