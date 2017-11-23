@@ -1,4 +1,19 @@
-  eval `ssh-agent -s`
+checkfiles() {
+
+  if [ ! -f /root/.ssh/id_rsa ]; then
+    echo "No ssh key found, aborting!"
+    exit
+  fi
+  if [ ! -f /secrets/GOOGLE_APPLICATION_CREDENTIALS.json ]; then
+    echo "GOOGLE_APPLICATION_CREDENTIALS not found, aborting!"
+    exit
+  fi
+
+}
+
+checkfiles
+
+eval `ssh-agent -s`
 echo "Init ssh-agent"
 chmod 0600 /root/.ssh/id_rsa
 echo "Altered ssh security permissions"

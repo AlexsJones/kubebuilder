@@ -10,10 +10,6 @@ spec:
       labels:
         app: kubebuilder
     spec:
-      # initContainers:
-      # - name: init-ssh
-      #   image: busybox
-      #   command: ['sh', '-c', 'ls']
       containers:
         - name: kubebuilder
           image: {{.registry}}/{{.version}}

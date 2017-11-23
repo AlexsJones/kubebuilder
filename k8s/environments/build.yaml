@@ -1,3 +1,5 @@
-version: kubebuilder:v1
+version: kubebuilder:0.0.0.2
 namespace: kubebuilder
-registry: us.gcr.io/beamery-trials
+registry: tibbar
+minreplicas: 1
+maxreplicas: 3

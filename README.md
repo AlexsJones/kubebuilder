@@ -9,14 +9,17 @@ and namespaces for creating applications.
 
 It requires a few pieces to get it all working, but is designed to be simple for the end user.
 
-### Requirements
+### Development Requirements
 
 - protobuf-compiler
-- sshkey for VCS (git currently)
-- Requires a json service account file for GCP named auth
-- Requires an ssh key that works as a secret named key
 - kepler for CLI interaction `go get https://github.com/AlexsJones/kepler`
 
+### Deployment Requirements
+
+Place google cloud service account in `k8s/required/files/auth.json`
+By Default will use current ssh key at `~/.ssh/id_rsa`
+
+Run `./scripts/deployment_kubernetes.sh`
 
 ### Usage
 
