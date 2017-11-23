@@ -1,6 +1,6 @@
 # kubebuilder
 <img src=https://i.imgur.com/xxDRsik.jpg width="250" />
-=======
+
 [![GitHub license](https://img.shields.io/github/license/AlexsJones/kubebuilder.svg)](https://github.com/AlexsJones/kubebuilder/blob/master/LICENSE)
 
 I initially built kubebuilder for the developers at [BeameryHQ](https://github.com/BeameryHQ)
