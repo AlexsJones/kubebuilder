@@ -1,8 +1,8 @@
 kubebuilder:
   mount: /mount #Note this is root level, assumes kubernetes has a volume mounted for build files
   drainqueue: false
-  bypassVCS: false
-  bypassBuild: false
+  bypassVCS: true
+  bypassBuild: true
   bypassKubernetes: false
 pubsub:
   connectionString: beamery-trials
